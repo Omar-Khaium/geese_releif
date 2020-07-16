@@ -1,4 +1,4 @@
-package com.centralstationmarketing.geese_releif
+package com.centralstationmarketing.geesereleif
 
 import io.flutter.embedding.android.FlutterActivity
 
