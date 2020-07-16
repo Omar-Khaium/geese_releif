@@ -1,0 +1,40 @@
+name: geese_releif
+description: A new Flutter application.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons:
+  hive:
+  hive_flutter:
+  google_fonts:
+  path_provider:
+  provider:
+  font_awesome_flutter:
+  shimmer:
+  intl:
+  flushbar: 1.10.0
+  url_launcher:
+  keyboard_visibility:
+  maps_launcher:
+  webview_flutter:
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  hive_generator:
+  build_runner:
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+    - images/
+
+module:
+  androidX: true
