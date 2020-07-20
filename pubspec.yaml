@@ -22,7 +22,6 @@ dependencies:
   url_launcher:
   keyboard_visibility:
   maps_launcher:
-  webview_flutter:
   bubble:
   flutter_staggered_grid_view:
   photo_view:

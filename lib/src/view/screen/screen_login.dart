@@ -3,8 +3,8 @@ import 'package:geesereleif/src/provider/provider_keyboard.dart';
 import 'package:geesereleif/src/view/util/constraints.dart';
 import 'package:geesereleif/src/view/util/helper.dart';
 import 'package:geesereleif/src/view/widget/widget_login.dart';
-import 'package:geesereleif/src/view/widget/widget_terms_and_conditions.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatelessWidget {
   final String routeName = "/login";
@@ -49,9 +49,7 @@ class LoginScreen extends StatelessWidget {
                 child: InkWell(
                   onTap: () {
                     keyboardProvider.hideKeyboard(context);
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => TermsAndConditions(),
-                        fullscreenDialog: true));
+                    launch("https://www.geeserelief.com/about-us/privacy.html", forceSafariVC: true);
                   },
                   child: Padding(
                     padding:
