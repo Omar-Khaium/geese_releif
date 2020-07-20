@@ -23,6 +23,10 @@ dependencies:
   keyboard_visibility:
   maps_launcher:
   webview_flutter:
+  bubble:
+  flutter_staggered_grid_view:
+  photo_view:
+  image_picker:
 
 dev_dependencies:
   flutter_test:

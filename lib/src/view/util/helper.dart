@@ -44,16 +44,26 @@ TextStyle getCaptionTextStyle(BuildContext context) {
   textStyle: Theme.of(context)
       .textTheme
       .caption
-      .copyWith(color: textColor.withOpacity(.75), fontWeight: FontWeight.normal),
+      .copyWith(color: textColor.withOpacity(.65), fontWeight: FontWeight.normal),
   );
 }
 
-TextStyle getClickableTextStyle(BuildContext context) {
-  return GoogleFonts.montserrat(
-  textStyle: Theme.of(context)
-      .textTheme
-      .subtitle2
-      .copyWith(color: accentColor, fontWeight: FontWeight.normal),
+TextStyle getClickableTextStyle(BuildContext context, {bool forMenu = false, bool forCount = false,}) {
+  return forCount ? GoogleFonts.montserrat(
+    textStyle: Theme.of(context)
+        .textTheme
+        .headline3
+        .copyWith(color: accentColor, fontWeight: FontWeight.normal),
+  ) : forMenu ? GoogleFonts.montserrat(
+    textStyle: Theme.of(context)
+        .textTheme
+        .headline6
+        .copyWith(color: accentColor, fontWeight: FontWeight.normal),
+  ) : GoogleFonts.montserrat(
+    textStyle: Theme.of(context)
+        .textTheme
+        .subtitle2
+        .copyWith(color: accentColor, fontWeight: FontWeight.normal),
   );
 }
 
@@ -63,5 +73,23 @@ TextStyle getButtonTextStyle(BuildContext context, {bool isOutline = true}) {
       .textTheme
       .headline6
       .copyWith(color: isOutline ? accentColor : backgroundColor, fontWeight: FontWeight.bold),
+  );
+}
+
+TextStyle getCheckInTextFieldStyle(BuildContext context) {
+  return GoogleFonts.montserrat(
+  textStyle: Theme.of(context)
+      .textTheme
+      .headline5
+      .copyWith(color: textColor, fontWeight: FontWeight.w900),
+  );
+}
+
+TextStyle getBadgeTextStyle(BuildContext context) {
+  return GoogleFonts.montserrat(
+  textStyle: Theme.of(context)
+      .textTheme
+      .caption
+      .copyWith(color: Colors.white, fontWeight: FontWeight.bold),
   );
 }

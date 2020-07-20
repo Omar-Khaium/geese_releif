@@ -18,7 +18,6 @@ class SearchWidget extends SearchDelegate<String> {
 
   @override
   Widget buildLeading(BuildContext context) {
-    // TODO: implement buildLeading
     return IconButton(
       icon: AnimatedIcon(
         icon: AnimatedIcons.menu_arrow,

@@ -5,6 +5,7 @@ import 'package:geese_releif/src/view/screen/screen_login.dart';
 import 'package:geese_releif/src/view/util/constraints.dart';
 import 'package:geese_releif/src/view/util/helper.dart';
 import 'package:geese_releif/src/view/widget/widget_search.dart';
+import 'package:maps_launcher/maps_launcher.dart';
 
 class CustomersScreen extends StatelessWidget {
   final String routeName = "/customers";
@@ -71,26 +72,31 @@ class CustomersScreen extends StatelessWidget {
                   SizedBox(height: 6,),
                 ],
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    "City, ST *****",
-                    style: getDefaultTextStyle(context),
-                  ),
-                  SizedBox(height: 2,),
-                  Text(
-                    "Phone",
-                    style: getCaptionTextStyle(context),
-                  ),
-                ],
+              InkWell(
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                onTap: (){
+                  MapsLauncher.launchQuery("Street\nCity, ST *****");
+                },
+                child: Text(
+                  "Street\nCity, ST *****",
+                  style: getClickableTextStyle(context),
+                ),
               ),
             ],
           ),
-          subtitle: Text(
-            "Date",
-            style: getCaptionTextStyle(context),
+          subtitle: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "dd MMM, yyyy h:mm a",
+                style: getCaptionTextStyle(context),
+              ),
+              Text(
+                "(xxx) xxx xxxx",
+                style: getCaptionTextStyle(context),
+              ),
+            ],
           ),
         ),
         itemCount: 5,
