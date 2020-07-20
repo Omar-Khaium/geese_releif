@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:geese_releif/src/view/screen/screen_customers.dart';
-import 'package:geese_releif/src/view/screen/screen_login.dart';
-import 'package:geese_releif/src/view/util/constraints.dart';
-import 'package:geese_releif/src/view/util/helper.dart';
+import 'package:geesereleif/src/view/screen/screen_customers.dart';
+import 'package:geesereleif/src/view/screen/screen_login.dart';
+import 'package:geesereleif/src/view/util/constraints.dart';
+import 'package:geesereleif/src/view/util/helper.dart';
 
 class RoutesScreen extends StatelessWidget {
   final String routeName = "/routes";

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:geese_releif/src/provider/provider_keyboard.dart';
-import 'package:geese_releif/src/view/util/constraints.dart';
-import 'package:geese_releif/src/view/util/helper.dart';
+import 'package:geesereleif/src/provider/provider_keyboard.dart';
+import 'package:geesereleif/src/view/util/constraints.dart';
+import 'package:geesereleif/src/view/util/helper.dart';
 import 'package:provider/provider.dart';
 
 class CheckIn extends StatelessWidget {

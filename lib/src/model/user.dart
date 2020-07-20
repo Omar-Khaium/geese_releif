@@ -1,4 +1,4 @@
-import 'package:geese_releif/src/view/util/constraints.dart';
+import 'package:geesereleif/src/view/util/constraints.dart';
 import 'package:hive/hive.dart';
 
 //part 'user.g.dart';

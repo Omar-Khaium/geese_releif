@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:geese_releif/src/model/media_file.dart';
-import 'package:geese_releif/src/view/screen/screen_photo_preview.dart';
+import 'package:geesereleif/src/model/media_file.dart';
+import 'package:geesereleif/src/view/screen/screen_photo_preview.dart';
 
 class PhotoPreview extends StatelessWidget {
   final List<MediaFile> files = [

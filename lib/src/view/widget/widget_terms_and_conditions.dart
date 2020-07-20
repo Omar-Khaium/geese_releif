@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:geese_releif/src/view/util/constraints.dart';
-import 'package:geese_releif/src/view/util/helper.dart';
+import 'package:geesereleif/src/view/util/constraints.dart';
+import 'package:geesereleif/src/view/util/helper.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class TermsAndConditions extends StatefulWidget {

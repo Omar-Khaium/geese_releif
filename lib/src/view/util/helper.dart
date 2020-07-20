@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:geese_releif/src/view/util/constraints.dart';
+import 'package:geesereleif/src/view/util/constraints.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 TextStyle getAppBarTextStyle(BuildContext context) {

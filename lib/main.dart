@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:geese_releif/src/provider/provider_keyboard.dart';
-import 'package:geese_releif/src/view/screen/screen_customer_details.dart';
-import 'package:geese_releif/src/view/screen/screen_customers.dart';
-import 'package:geese_releif/src/view/screen/screen_login.dart';
-import 'package:geese_releif/src/view/screen/screen_onboard.dart';
-import 'package:geese_releif/src/view/screen/screen_photo_preview.dart';
-import 'package:geese_releif/src/view/screen/screen_routes.dart';
-import 'package:geese_releif/src/view/util/constraints.dart';
+import 'package:geesereleif/src/provider/provider_keyboard.dart';
+import 'package:geesereleif/src/view/screen/screen_customer_details.dart';
+import 'package:geesereleif/src/view/screen/screen_customers.dart';
+import 'package:geesereleif/src/view/screen/screen_login.dart';
+import 'package:geesereleif/src/view/screen/screen_onboard.dart';
+import 'package:geesereleif/src/view/screen/screen_photo_preview.dart';
+import 'package:geesereleif/src/view/screen/screen_routes.dart';
+import 'package:geesereleif/src/view/util/constraints.dart';
 import 'package:provider/provider.dart';
 
 void main() {

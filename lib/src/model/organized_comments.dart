@@ -1,4 +1,4 @@
-import 'package:geese_releif/src/model/comment.dart';
+import 'package:geesereleif/src/model/comment.dart';
 
 class OrganizedComments {
   String date;

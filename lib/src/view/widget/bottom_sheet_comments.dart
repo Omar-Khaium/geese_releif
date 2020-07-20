@@ -1,8 +1,8 @@
 import 'package:bubble/bubble.dart';
 import 'package:flutter/material.dart';
-import 'package:geese_releif/src/model/comment.dart';
-import 'package:geese_releif/src/model/organized_comments.dart';
-import 'package:geese_releif/src/view/util/helper.dart';
+import 'package:geesereleif/src/model/comment.dart';
+import 'package:geesereleif/src/model/organized_comments.dart';
+import 'package:geesereleif/src/view/util/helper.dart';
 
 // ignore: must_be_immutable
 class CommentsPreview extends StatelessWidget {
