@@ -6,6 +6,7 @@ import 'package:geesereleif/src/view/screen/screen_login.dart';
 import 'package:geesereleif/src/view/screen/screen_onboard.dart';
 import 'package:geesereleif/src/view/screen/screen_photo_preview.dart';
 import 'package:geesereleif/src/view/screen/screen_routes.dart';
+import 'package:geesereleif/src/view/screen/screen_upload_file.dart';
 import 'package:geesereleif/src/view/util/constraints.dart';
 import 'package:provider/provider.dart';
 
@@ -42,6 +43,7 @@ class MyApp extends StatelessWidget {
           RoutesScreen().routeName: (context)=> RoutesScreen(),
           CustomersScreen().routeName: (context)=> CustomersScreen(),
           CustomerDetailsScreen().routeName: (context)=> CustomerDetailsScreen(),
+          UploadFileScreen().routeName: (context)=> UploadFileScreen(),
           ViewPhotoScreen().routeName: (context)=> ViewPhotoScreen(),
         },
       ),

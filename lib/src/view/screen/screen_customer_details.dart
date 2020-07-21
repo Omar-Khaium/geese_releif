@@ -1,21 +1,34 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:geesereleif/src/view/screen/screen_upload_file.dart';
 import 'package:geesereleif/src/view/util/constraints.dart';
 import 'package:geesereleif/src/view/util/helper.dart';
 import 'package:geesereleif/src/view/widget/bottom_sheet_check_in.dart';
 import 'package:geesereleif/src/view/widget/bottom_sheet_comments.dart';
 import 'package:geesereleif/src/view/widget/bottom_sheet_media.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class CustomerDetailsScreen extends StatelessWidget {
+class CustomerDetailsScreen extends StatefulWidget {
   final String routeName = "/customer_details";
+  @override
+  _CustomerDetailsScreenState createState() => _CustomerDetailsScreenState();
+}
 
+class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
+
+  File _image;
   final picker = ImagePicker();
+
+  TextEditingController _noteController = TextEditingController(
+      text:
+          "The next generation of our icon library + toolkit is coming with more icons, more styles, more services, and more awesome.");
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +51,7 @@ class CustomerDetailsScreen extends StatelessWidget {
                     ),
                     onPressed: () async {
                       Navigator.of(context).pop();
-                      await picker.getImage(source: ImageSource.camera);
+                      getImage(ImageSource.camera);
                     },
                   ),
                   CupertinoActionSheetAction(
@@ -46,8 +59,8 @@ class CustomerDetailsScreen extends StatelessWidget {
                         style: getClickableTextStyle(context, forMenu: true)),
                     onPressed: () async {
                       Navigator.of(context).pop();
-                      await picker.getImage(source: ImageSource.gallery);
-                      },
+                      getImage(ImageSource.gallery);
+                    },
                   ),
                 ],
                 cancelButton: CupertinoActionSheetAction(
@@ -126,7 +139,7 @@ class CustomerDetailsScreen extends StatelessWidget {
                   ),
                   ListTile(
                     onTap: () {
-                      launch("tel:(302) 254 2154");
+                      launch("tel:+1 555 010 999");
                     },
                     leading: Icon(
                       FontAwesomeIcons.phoneAlt,
@@ -182,21 +195,42 @@ class CustomerDetailsScreen extends StatelessWidget {
                     ),
                     dense: true,
                   ),
-                  ListTile(
-                    leading: Icon(
-                      FontAwesomeIcons.solidCommentAlt,
-                      color: textColor,
-                      size: 18,
-                    ),
-                    title: Text(
-                      "The next generation of our icon library + toolkit is coming with more icons, more styles, more services, and more awesome. Pre-order today and get a special price and early access!",
+                  Container(
+                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: TextField(
+                      controller: _noteController,
+                      keyboardType: TextInputType.multiline,
+                      cursorColor: textColor,
+                      textAlign: TextAlign.justify,
+                      textAlignVertical: TextAlignVertical.top,
+                      maxLines: 4,
                       style: getDefaultTextStyle(context),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(0),
+                          borderSide: BorderSide(color: accentColor, width: 1),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(0),
+                          borderSide: BorderSide(color: accentColor, width: 2),
+                        ),
+                        suffixIcon: IconButton(
+                          onPressed: () {},
+                          icon: Icon(
+                            FontAwesomeIcons.share,
+                            size: 20,
+                            color: accentColor,
+                          ),
+                        ),
+                        hintText: "Write a note...",
+                        hintStyle: getHintTextStyle(context),
+                        isDense: true,
+                      ),
                     ),
-                    dense: true,
                   ),
-                  SizedBox(height: 24,),
+                  SizedBox(
+                    height: 12,
+                  ),
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -204,17 +238,20 @@ class CustomerDetailsScreen extends StatelessWidget {
                       InkWell(
                         splashColor: Colors.transparent,
                         highlightColor: Colors.transparent,
-                        onTap: (){
-                          showModalBottomSheet(context: context, builder: (context)=>PhotoPreview());
+                        onTap: () {
+                          showModalBottomSheet(
+                              context: context,
+                              builder: (context) => PhotoPreview(),
+                          );
                         },
                         child: Container(
-                          width: MediaQuery.of(context).size.width*.4,
-                          height: MediaQuery.of(context).size.width*.3,
+                          width: MediaQuery.of(context).size.width * .4,
+                          height: MediaQuery.of(context).size.width * .3,
                           decoration: BoxDecoration(
                             color: backgroundColor,
                             boxShadow: [
                               BoxShadow(
-                                offset: Offset(0,0),
+                                offset: Offset(0, 0),
                                 color: Colors.grey.shade200,
                                 spreadRadius: 4,
                                 blurRadius: 4,
@@ -227,29 +264,43 @@ class CustomerDetailsScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(FontAwesomeIcons.solidImages, size: 20, color: accentColor,),
-                                SizedBox(height: 4,),
-                                Text("13", style: getClickableTextStyle(context, forCount: true),),
+                                Icon(
+                                  FontAwesomeIcons.solidImages,
+                                  size: 20,
+                                  color: accentColor,
+                                ),
+                                SizedBox(
+                                  height: 4,
+                                ),
+                                Text(
+                                  "13",
+                                  style: getClickableTextStyle(context,
+                                      forCount: true),
+                                ),
                               ],
                             ),
                           ),
                         ),
                       ),
-                      SizedBox(width: 24,),
+                      SizedBox(
+                        width: 24,
+                      ),
                       InkWell(
                         splashColor: Colors.transparent,
                         highlightColor: Colors.transparent,
-                        onTap: (){
-                          showModalBottomSheet(context: context, builder: (context)=>CommentsPreview());
-                          },
+                        onTap: () {
+                          showModalBottomSheet(
+                              context: context,
+                              builder: (context) => CommentsPreview());
+                        },
                         child: Container(
-                          width: MediaQuery.of(context).size.width*.4,
-                          height: MediaQuery.of(context).size.width*.3,
+                          width: MediaQuery.of(context).size.width * .4,
+                          height: MediaQuery.of(context).size.width * .3,
                           decoration: BoxDecoration(
                             color: backgroundColor,
                             boxShadow: [
                               BoxShadow(
-                                offset: Offset(0,0),
+                                offset: Offset(0, 0),
                                 color: Colors.grey.shade200,
                                 spreadRadius: 4,
                                 blurRadius: 4,
@@ -262,9 +313,19 @@ class CustomerDetailsScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(FontAwesomeIcons.solidComments, size: 20, color: accentColor,),
-                                SizedBox(height: 4,),
-                                Text("24", style: getClickableTextStyle(context, forCount: true),),
+                                Icon(
+                                  FontAwesomeIcons.solidComments,
+                                  size: 20,
+                                  color: accentColor,
+                                ),
+                                SizedBox(
+                                  height: 4,
+                                ),
+                                Text(
+                                  "24",
+                                  style: getClickableTextStyle(context,
+                                      forCount: true),
+                                ),
                               ],
                             ),
                           ),
@@ -310,5 +371,44 @@ class CustomerDetailsScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future getImage(source) async {
+    final pickedFile = await picker.getImage(source: source);
+
+    setState(() {
+      _image = File(pickedFile.path);
+    });
+    _image =await ImageCropper.cropImage(
+        sourcePath: _image.path,
+        aspectRatioPresets: Platform.isAndroid
+            ? [
+          CropAspectRatioPreset.square,
+          CropAspectRatioPreset.ratio3x2,
+          CropAspectRatioPreset.original,
+          CropAspectRatioPreset.ratio4x3,
+          CropAspectRatioPreset.ratio16x9
+        ]
+            : [
+          CropAspectRatioPreset.original,
+          CropAspectRatioPreset.square,
+          CropAspectRatioPreset.ratio3x2,
+          CropAspectRatioPreset.ratio4x3,
+          CropAspectRatioPreset.ratio5x3,
+          CropAspectRatioPreset.ratio5x4,
+          CropAspectRatioPreset.ratio7x5,
+          CropAspectRatioPreset.ratio16x9
+        ],
+        androidUiSettings: AndroidUiSettings(
+            toolbarTitle: 'Adjust Image',
+            toolbarColor: Colors.deepOrange,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false),
+        iosUiSettings: IOSUiSettings(
+          title: 'Adjust Image',
+        ));
+
+    Navigator.of(context).pushNamed(UploadFileScreen().routeName, arguments: _image);
   }
 }

@@ -18,21 +18,24 @@ class CheckIn extends StatelessWidget {
               bottom: 0,
               right: 0,
               left: 0,
-              child: FlatButton(
-                onPressed: () {},
-                color: accentColor,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Text(
-                    "Check In",
-                    style: getButtonTextStyle(context, isOutline: false),
+              child: Container(
+                height: 54,
+                child: FlatButton(
+                  onPressed: () {},
+                  color: accentColor,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: Text(
+                      "Check In",
+                      style: getButtonTextStyle(context, isOutline: false),
+                    ),
                   ),
                 ),
               ),
             ),
             Positioned(
               top: 0,
-              bottom: 0,
+              bottom: 54,
               right: 0,
               left: 0,
               child: Center(
