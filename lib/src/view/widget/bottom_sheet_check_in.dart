@@ -19,11 +19,11 @@ class CheckIn extends StatelessWidget {
               right: 0,
               left: 0,
               child: FlatButton(
-                onPressed: (){},
+                onPressed: () {},
                 color: accentColor,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12),
-                  child:  Text(
+                  child: Text(
                     "Check In",
                     style: getButtonTextStyle(context, isOutline: false),
                   ),
@@ -31,36 +31,46 @@ class CheckIn extends StatelessWidget {
               ),
             ),
             Positioned(
-              top: 32,
+              top: 0,
+              bottom: 0,
               right: 0,
               left: 0,
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(height: keyboardProvider.isKeyboardVisible ? 0 : 112,),
-                    Image.asset("images/logo.png",height: 42,),
-                    SizedBox(height: 24),
-                    TextField(
-                      keyboardType: TextInputType.number,
-                      cursorColor: textColor,
-                      style: getCheckInTextFieldStyle(context),
-                      textAlign: TextAlign.center,
-                      decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(0),
-                            borderSide: BorderSide(color: accentColor, width: 1),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(0),
-                            borderSide: BorderSide(color: accentColor, width: 2),
-                          ),
-                          hintText: "How many geese do you see?",
-                          hintStyle: getHintTextStyle(context),
-                          isDense: true),
-                    ),
-                  ],
+              child: Center(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Visibility(
+                        child: Image.asset(
+                          "images/logo.png",
+                          height: 42,
+                        ),
+                        visible: !keyboardProvider.isKeyboardVisible,
+                      ),
+                      SizedBox(height: 24),
+                      TextField(
+                        keyboardType: TextInputType.number,
+                        cursorColor: textColor,
+                        style: getCheckInTextFieldStyle(context),
+                        textAlign: TextAlign.center,
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(0),
+                              borderSide:
+                                  BorderSide(color: accentColor, width: 1),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(0),
+                              borderSide:
+                                  BorderSide(color: accentColor, width: 2),
+                            ),
+                            hintText: "How many geese do you see?",
+                            hintStyle: getHintTextStyle(context),
+                            isDense: true),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             )
