@@ -7,7 +7,7 @@ TextStyle getAppBarTextStyle(BuildContext context) {
   return GoogleFonts.montserrat(
   textStyle: Theme.of(context)
       .textTheme
-      .headline5
+      .headline6
       .copyWith(color: textColor, fontWeight: FontWeight.bold),
   );
 }

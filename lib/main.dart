@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:geesereleif/src/provider/provider_keyboard.dart';
 import 'package:geesereleif/src/view/screen/screen_customer_details.dart';
 import 'package:geesereleif/src/view/screen/screen_customers.dart';
+import 'package:geesereleif/src/view/screen/screen_history.dart';
 import 'package:geesereleif/src/view/screen/screen_login.dart';
 import 'package:geesereleif/src/view/screen/screen_onboard.dart';
 import 'package:geesereleif/src/view/screen/screen_photo_preview.dart';
+import 'package:geesereleif/src/view/screen/screen_profile.dart';
 import 'package:geesereleif/src/view/screen/screen_routes.dart';
 import 'package:geesereleif/src/view/screen/screen_upload_file.dart';
 import 'package:geesereleif/src/view/util/constraints.dart';
@@ -45,6 +47,8 @@ class MyApp extends StatelessWidget {
           CustomerDetailsScreen().routeName: (context)=> CustomerDetailsScreen(),
           UploadFileScreen().routeName: (context)=> UploadFileScreen(),
           ViewPhotoScreen().routeName: (context)=> ViewPhotoScreen(),
+          ProfileScreen().routeName: (context)=> ProfileScreen(),
+          HistoryScreen().routeName: (context)=> HistoryScreen(),
         },
       ),
     );

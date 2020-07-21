@@ -1,7 +1,11 @@
+import 'dart:ui';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geesereleif/src/view/screen/screen_customers.dart';
+import 'package:geesereleif/src/view/screen/screen_history.dart';
 import 'package:geesereleif/src/view/screen/screen_login.dart';
+import 'package:geesereleif/src/view/screen/screen_profile.dart';
 import 'package:geesereleif/src/view/util/constraints.dart';
 import 'package:geesereleif/src/view/util/helper.dart';
 
@@ -20,22 +24,74 @@ class RoutesScreen extends StatelessWidget {
           style: getAppBarTextStyle(context),
         ),
         actions: [
-          IconButton(
-            onPressed: (){
-              Navigator.of(context).pushReplacementNamed(LoginScreen().routeName);
-            },
-            icon: Icon(FontAwesomeIcons.signOutAlt, size: 20, color: textColor,),
-          )
+          Container(
+            margin: const EdgeInsets.only(right: 12),
+            child: ActionChip(
+              label: Text(
+                "John Doe",
+                style: getDefaultTextStyle(context),
+              ),
+              onPressed: () {
+                showCupertinoModalPopup(
+                  context: context,
+                  filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                  builder: (context) => CupertinoActionSheet(
+                    actions: <Widget>[
+                      CupertinoActionSheetAction(
+                        child: Text(
+                          "Profile",
+                          style: getClickableTextStyle(context, forMenu: true),
+                        ),
+                        onPressed: () async {
+                          Navigator.of(context)
+                              .pushNamed(ProfileScreen().routeName);
+                          },
+                      ),
+                      CupertinoActionSheetAction(
+                        child: Text("History",
+                            style: getClickableTextStyle(context, forMenu: true)),
+                        onPressed: () async {
+                          Navigator.of(context)
+                              .pushNamed(HistoryScreen().routeName);},
+                      ),
+                    ],
+                    cancelButton: CupertinoActionSheetAction(
+                      child: Text(
+                        "Logout",
+                        style: getDeleteTextStyle(context),
+                      ),
+                      isDestructiveAction: true,
+                      onPressed: () {
+                        Navigator.of(context)
+                            .pushReplacementNamed(LoginScreen().routeName);
+                      },
+                    ),
+                  ),
+                );
+              },
+              avatar: ClipRRect(
+                borderRadius: BorderRadius.circular(32),
+                child: CircleAvatar(
+                  child: Image.network("https://uifaces.co/our-content/donated/8CEV1nXA.jpg",),
+                  backgroundColor: backgroundColor,
+                ),
+                clipBehavior: Clip.antiAliasWithSaveLayer,
+              ),
+            ),
+          ),
         ],
       ),
       body: ListView.separated(
         shrinkWrap: true,
         scrollDirection: Axis.vertical,
         physics: ScrollPhysics(),
-        separatorBuilder: (context, index) => Divider(color: hintColor,thickness: .25,),
+        separatorBuilder: (context, index) => Divider(
+          color: hintColor,
+          thickness: .25,
+        ),
         itemBuilder: (context, index) => ListTile(
           dense: true,
-          onTap: (){
+          onTap: () {
             Navigator.of(context).pushNamed(CustomersScreen().routeName);
           },
           trailing: Icon(

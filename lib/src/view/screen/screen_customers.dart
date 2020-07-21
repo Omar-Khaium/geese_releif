@@ -1,7 +1,12 @@
+import 'dart:ui';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geesereleif/src/view/screen/screen_customer_details.dart';
+import 'package:geesereleif/src/view/screen/screen_history.dart';
 import 'package:geesereleif/src/view/screen/screen_login.dart';
+import 'package:geesereleif/src/view/screen/screen_profile.dart';
 import 'package:geesereleif/src/view/util/constraints.dart';
 import 'package:geesereleif/src/view/util/helper.dart';
 import 'package:geesereleif/src/view/widget/widget_search.dart';
@@ -29,11 +34,49 @@ class CustomersScreen extends StatelessWidget {
             },
           ),
           IconButton(
-            onPressed: (){
-              Navigator.of(context).pushReplacementNamed(LoginScreen().routeName);
+            icon: CircleAvatar(
+              child: Image.network("https://uifaces.co/our-content/donated/8CEV1nXA.jpg",),
+              backgroundColor: Colors.grey.shade200,
+            ),
+            onPressed: () {
+              showCupertinoModalPopup(
+                context: context,
+                filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                builder: (context) => CupertinoActionSheet(
+                  actions: <Widget>[
+                    CupertinoActionSheetAction(
+                      child: Text(
+                        "Profile",
+                        style: getClickableTextStyle(context, forMenu: true),
+                      ),
+                      onPressed: () async {
+                        Navigator.of(context)
+                            .pushNamed(ProfileScreen().routeName);
+                      },
+                    ),
+                    CupertinoActionSheetAction(
+                      child: Text("History",
+                          style: getClickableTextStyle(context, forMenu: true)),
+                      onPressed: () async {
+                        Navigator.of(context)
+                            .pushNamed(HistoryScreen().routeName);},
+                    ),
+                  ],
+                  cancelButton: CupertinoActionSheetAction(
+                    child: Text(
+                      "Logout",
+                      style: getDeleteTextStyle(context),
+                    ),
+                    isDestructiveAction: true,
+                    onPressed: () {
+                      Navigator.of(context)
+                          .pushReplacementNamed(LoginScreen().routeName);
+                    },
+                  ),
+                ),
+              );
             },
-            icon: Icon(FontAwesomeIcons.signOutAlt, size: 20, color: textColor,),
-          )
+          ),
         ],
       ),
       body: ListView.separated(
