@@ -80,7 +80,7 @@ TextStyle getCheckInTextFieldStyle(BuildContext context) {
   return GoogleFonts.montserrat(
   textStyle: Theme.of(context)
       .textTheme
-      .headline5
+      .subtitle1
       .copyWith(color: textColor, fontWeight: FontWeight.w900),
   );
 }

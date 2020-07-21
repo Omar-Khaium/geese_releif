@@ -9,7 +9,7 @@ class CheckIn extends StatelessWidget {
   Widget build(BuildContext context) {
     final keyboardProvider = Provider.of<KeyboardProvider>(context);
     return Container(
-      height: keyboardProvider.isKeyboardVisible ? 460 : 440,
+      height: keyboardProvider.isKeyboardVisible ? 484 : 440,
       child: Scaffold(
         backgroundColor: backgroundColor,
         body: Stack(
@@ -48,7 +48,10 @@ class CheckIn extends StatelessWidget {
                         ),
                         visible: !keyboardProvider.isKeyboardVisible,
                       ),
-                      SizedBox(height: 24),
+                      Visibility(
+                        child: SizedBox(height: 24),
+                        visible: !keyboardProvider.isKeyboardVisible,
+                      ),
                       TextField(
                         keyboardType: TextInputType.number,
                         cursorColor: textColor,
