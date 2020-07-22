@@ -19,6 +19,8 @@ class RoutesScreen extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: backgroundColor,
+        titleSpacing: 16,
+        centerTitle: false,
         title: Text(
           "Routes".toUpperCase(),
           style: getAppBarTextStyle(context),
@@ -26,12 +28,12 @@ class RoutesScreen extends StatelessWidget {
         actions: [
           Container(
             margin: const EdgeInsets.only(right: 12),
-            child: ActionChip(
+            child: ChoiceChip(
               label: Text(
                 "John Doe",
                 style: getDefaultTextStyle(context),
               ),
-              onPressed: () {
+              onSelected: (flag) {
                 showCupertinoModalPopup(
                   context: context,
                   filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
@@ -43,16 +45,20 @@ class RoutesScreen extends StatelessWidget {
                           style: getClickableTextStyle(context, forMenu: true),
                         ),
                         onPressed: () async {
+                          Navigator.of(context).pop();
                           Navigator.of(context)
                               .pushNamed(ProfileScreen().routeName);
-                          },
+                        },
                       ),
                       CupertinoActionSheetAction(
                         child: Text("History",
-                            style: getClickableTextStyle(context, forMenu: true)),
+                            style:
+                                getClickableTextStyle(context, forMenu: true)),
                         onPressed: () async {
+                          Navigator.of(context).pop();
                           Navigator.of(context)
-                              .pushNamed(HistoryScreen().routeName);},
+                              .pushNamed(HistoryScreen().routeName);
+                        },
                       ),
                     ],
                     cancelButton: CupertinoActionSheetAction(
@@ -69,14 +75,17 @@ class RoutesScreen extends StatelessWidget {
                   ),
                 );
               },
+              clipBehavior: Clip.antiAliasWithSaveLayer,
               avatar: ClipRRect(
                 borderRadius: BorderRadius.circular(32),
-                child: CircleAvatar(
-                  child: Image.network("https://uifaces.co/our-content/donated/8CEV1nXA.jpg",),
-                  backgroundColor: backgroundColor,
-                ),
                 clipBehavior: Clip.antiAliasWithSaveLayer,
+                child: Image.network(
+                  "https://uifaces.co/our-content/donated/8CEV1nXA.jpg",
+                ),
               ),
+              selected: false,
+              backgroundColor: Colors.grey.shade200,
+              elevation: 0,
             ),
           ),
         ],

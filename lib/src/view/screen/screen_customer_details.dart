@@ -89,6 +89,8 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
         iconTheme: IconThemeData(color: textColor),
         backgroundColor: backgroundColor,
         elevation: 0,
+        titleSpacing: 0,
+        centerTitle: false,
         title: Text(
           "John Doe".toUpperCase(),
           style: getAppBarTextStyle(context),
@@ -139,7 +141,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                   ),
                   ListTile(
                     onTap: () {
-                      launch("tel:+1 555 010 999");
+                      launch("tel:+1 555 010 9990");
                     },
                     leading: Icon(
                       FontAwesomeIcons.phoneAlt,
@@ -147,7 +149,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                       size: 18,
                     ),
                     title: Text(
-                      "(302) 254 2154",
+                      "(555) 010 9990",
                       style: getDefaultTextStyle(context),
                     ),
                     dense: true,
