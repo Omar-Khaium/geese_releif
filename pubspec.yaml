@@ -10,8 +10,6 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons:
-  hive:
-  hive_flutter:
   google_fonts:
   path_provider:
   provider:
@@ -31,8 +29,6 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  hive_generator:
-  build_runner:
 
 flutter:
   uses-material-design: true

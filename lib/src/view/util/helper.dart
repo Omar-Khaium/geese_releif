@@ -26,9 +26,9 @@ List<History> parseHistory(List<History> histories) {
 
 int doesHistoryExists(List<History> histories, History history) {
   for (int i = 0; i < histories.length; i++) {
-    if (stringToDateTime(histories[i].dateTime, ULTIMATE_DATE_FORMAT)
+    if (stringToDateTime(histories[i].dateTime, ultimateDateFormat)
             .difference(
-                stringToDateTime(history.dateTime, ULTIMATE_DATE_FORMAT))
+                stringToDateTime(history.dateTime, ultimateDateFormat))
             .inDays ==
         0) {
       return i;

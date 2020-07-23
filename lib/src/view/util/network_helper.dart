@@ -17,8 +17,8 @@ class NetworkHelper {
 
   static Future<Response> apiPOST(
       {@required String api,
-        Map<String, String> headers,
-        Map<String, String> body}) async {
+      Map<String, String> headers,
+      Map<String, String> body}) async {
     return await post(apiBaseUrl + api, headers: headers, body: body);
   }
 

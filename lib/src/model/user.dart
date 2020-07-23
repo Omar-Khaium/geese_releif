@@ -1,55 +1,68 @@
-import 'package:geesereleif/src/view/util/constraints.dart';
-import 'package:hive/hive.dart';
-
-//part 'user.g.dart';
-
-@HiveType(adapterName: "UserAdapter", typeId: tableUSER)
 class User {
-  @HiveField(0)
   int id;
-  @HiveField(1)
   String guid;
-  @HiveField(2)
+  String token;
   String profilePicture;
-  @HiveField(3)
   String name;
-  @HiveField(3)
   String email;
-  @HiveField(4)
   String phone;
-  @HiveField(5)
+  String street;
+  String city;
+  String state;
+  String zip;
   String password;
-  @HiveField(6)
+  String lastUpdatedDate;
   bool rememberMeEnabled;
-  @HiveField(7)
   bool isAuthenticated;
-  @HiveField(8)
   String companyLogo;
-  @HiveField(9)
   String companyName;
-  @HiveField(10)
   String companyGUID;
-  @HiveField(11)
   String companyCity;
-  @HiveField(12)
   String companyState;
-  @HiveField(13)
-  int companyZip;
+  String companyZip;
 
   User(
       {this.id,
-        this.guid,
-        this.profilePicture,
-        this.name,
-        this.email,
-        this.phone,
-        this.password,
-        this.rememberMeEnabled,
-        this.isAuthenticated,
-        this.companyLogo,
-        this.companyName,
-        this.companyGUID,
-        this.companyCity,
-        this.companyState,
-        this.companyZip});
+      this.guid,
+      this.token,
+      this.profilePicture,
+      this.name,
+      this.email,
+      this.phone,
+      this.street,
+      this.city,
+      this.state,
+      this.zip,
+      this.lastUpdatedDate,
+      this.password,
+      this.rememberMeEnabled,
+      this.isAuthenticated,
+      this.companyLogo,
+      this.companyName,
+      this.companyGUID,
+      this.companyCity,
+      this.companyState,
+      this.companyZip});
+
+  User.fromJson(Map<String, dynamic> json, User old) {
+    id = json["emp"]["Id"];
+    guid = json["emp"]["UserId"];
+    profilePicture = "http://gratecrm.com${json["emp"]["ProfilePicture"]}";
+    name = "${json["emp"]["FirstName"]} ${json["emp"]["LastName"]}";
+    phone = json["emp"]["Phone"];
+    street = json["emp"]["Street"];
+    city = json["emp"]["City"];
+    state = json["emp"]["State"];
+    zip = json["emp"]["ZipCode"];
+    lastUpdatedDate = json["emp"]["LastUpdatedDate"];
+    email = old.email;
+    token = old.token;
+    password = old.password;
+    companyLogo = "http://gratecrm.com${json["company"]["CompanyLogo"]}";
+    companyName = json["company"]["CompanyName"];
+    companyGUID = json["company"]["CompanyId  "];
+    companyCity = json["company"]["City"];
+    companyState = json["company"]["State"];
+    companyZip = json["company"]["ZipCode"];
+  }
 }

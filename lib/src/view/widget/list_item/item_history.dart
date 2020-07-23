@@ -19,7 +19,7 @@ class HistoryItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            dateTimeToStringDate(stringToDateTime(history.dateTime, ULTIMATE_DATE_FORMAT), "MM/dd/yyyy"),
+            dateTimeToStringDate(stringToDateTime(history.dateTime, ultimateDateFormat), "MM/dd/yyyy"),
             style: getDefaultTextStyle(context, isFocused: true),
           ),
           ListView.builder(

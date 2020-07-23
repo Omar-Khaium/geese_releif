@@ -4,6 +4,8 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:geesereleif/src/model/customer.dart';
+import 'package:geesereleif/src/provider/provider_customer.dart';
 import 'package:geesereleif/src/view/screen/screen_upload_file.dart';
 import 'package:geesereleif/src/view/util/constraints.dart';
 import 'package:geesereleif/src/view/util/helper.dart';
@@ -13,25 +15,28 @@ import 'package:geesereleif/src/view/widget/bottom_sheet_media.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:maps_launcher/maps_launcher.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CustomerDetailsScreen extends StatefulWidget {
   final String routeName = "/customer_details";
+
   @override
   _CustomerDetailsScreenState createState() => _CustomerDetailsScreenState();
 }
 
 class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
-
   File _image;
   final picker = ImagePicker();
 
-  TextEditingController _noteController = TextEditingController(
-      text:
-          "The next generation of our icon library + toolkit is coming with more icons, more styles, more services, and more awesome.");
+  TextEditingController _noteController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    final String id = ModalRoute.of(context).settings.arguments as String;
+    final customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
+    final Customer customer = customerProvider.findCustomerByID(id);
     return Scaffold(
       backgroundColor: backgroundColor,
       floatingActionButton: Container(
@@ -92,7 +97,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
         titleSpacing: 0,
         centerTitle: false,
         title: Text(
-          "John Doe".toUpperCase(),
+          customer.name.toUpperCase(),
           style: getAppBarTextStyle(context),
           overflow: TextOverflow.ellipsis,
         ),
@@ -101,12 +106,12 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
             child: Container(
               margin: EdgeInsets.only(right: 16),
               height: 22,
-              width: 54,
+              width: 84,
               decoration: BoxDecoration(
                   color: Colors.orange, borderRadius: BorderRadius.circular(4)),
               child: Center(
                   child: Text(
-                "Lead",
+                customer.lead,
                 style: getBadgeTextStyle(context),
               )),
             ),
@@ -134,14 +139,14 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                       size: 18,
                     ),
                     title: Text(
-                      "Jhon Doe",
+                      customer.name,
                       style: getDefaultTextStyle(context),
                     ),
                     dense: true,
                   ),
                   ListTile(
                     onTap: () {
-                      launch("tel:+1 555 010 9990");
+                      launch("tel:${customer.phone}");
                     },
                     leading: Icon(
                       FontAwesomeIcons.phoneAlt,
@@ -149,14 +154,14 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                       size: 18,
                     ),
                     title: Text(
-                      "(555) 010 9990",
+                      customer.phone,
                       style: getDefaultTextStyle(context),
                     ),
                     dense: true,
                   ),
                   ListTile(
                     onTap: () {
-                      MapsLauncher.launchQuery("Street\nCity, ST *****");
+                      MapsLauncher.launchQuery("${customer.street}\n${customer.city}, ${customer.state.toUpperCase()} ${customer.zip}");
                     },
                     leading: Icon(
                       FontAwesomeIcons.mapMarkerAlt,
@@ -164,11 +169,11 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                       size: 18,
                     ),
                     title: Text(
-                      "22/B Old Baker Street",
+                      customer.street,
                       style: getDefaultTextStyle(context),
                     ),
                     subtitle: Text(
-                      "South London, SC 21015",
+                      "${customer.city}, ${customer.state.toUpperCase()} ${customer.zip}",
                       style: getDefaultTextStyle(context),
                     ),
                     dense: true,
@@ -180,7 +185,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                       size: 18,
                     ),
                     title: Text(
-                      "29 Sep, 2019 8:05 AM",
+                      "${dateTimeToStringDate(stringToDateTime(customer.lastCheckIn, ultimateDateFormat), "dd MMM, yyyy")} ${dateTimeToStringTime(stringToDateTime(customer.lastCheckIn, ultimateDateFormat), "hh:mm a")}",
                       style: getDefaultTextStyle(context),
                     ),
                     dense: true,
@@ -192,7 +197,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                       size: 18,
                     ),
                     title: Text(
-                      "3",
+                      "${customer.geeseCount}",
                       style: getDefaultTextStyle(context),
                     ),
                     dense: true,
@@ -242,8 +247,8 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                         highlightColor: Colors.transparent,
                         onTap: () {
                           showModalBottomSheet(
-                              context: context,
-                              builder: (context) => PhotoPreview(),
+                            context: context,
+                            builder: (context) => PhotoPreview(),
                           );
                         },
                         child: Container(
@@ -381,26 +386,26 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
     setState(() {
       _image = File(pickedFile.path);
     });
-    _image =await ImageCropper.cropImage(
+    _image = await ImageCropper.cropImage(
         sourcePath: _image.path,
         aspectRatioPresets: Platform.isAndroid
             ? [
-          CropAspectRatioPreset.square,
-          CropAspectRatioPreset.ratio3x2,
-          CropAspectRatioPreset.original,
-          CropAspectRatioPreset.ratio4x3,
-          CropAspectRatioPreset.ratio16x9
-        ]
+                CropAspectRatioPreset.square,
+                CropAspectRatioPreset.ratio3x2,
+                CropAspectRatioPreset.original,
+                CropAspectRatioPreset.ratio4x3,
+                CropAspectRatioPreset.ratio16x9
+              ]
             : [
-          CropAspectRatioPreset.original,
-          CropAspectRatioPreset.square,
-          CropAspectRatioPreset.ratio3x2,
-          CropAspectRatioPreset.ratio4x3,
-          CropAspectRatioPreset.ratio5x3,
-          CropAspectRatioPreset.ratio5x4,
-          CropAspectRatioPreset.ratio7x5,
-          CropAspectRatioPreset.ratio16x9
-        ],
+                CropAspectRatioPreset.original,
+                CropAspectRatioPreset.square,
+                CropAspectRatioPreset.ratio3x2,
+                CropAspectRatioPreset.ratio4x3,
+                CropAspectRatioPreset.ratio5x3,
+                CropAspectRatioPreset.ratio5x4,
+                CropAspectRatioPreset.ratio7x5,
+                CropAspectRatioPreset.ratio16x9
+              ],
         androidUiSettings: AndroidUiSettings(
             toolbarTitle: 'Adjust Image',
             toolbarColor: Colors.deepOrange,
@@ -411,6 +416,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
           title: 'Adjust Image',
         ));
 
-    Navigator.of(context).pushNamed(UploadFileScreen().routeName, arguments: _image);
+    Navigator.of(context)
+        .pushNamed(UploadFileScreen().routeName, arguments: _image);
   }
 }

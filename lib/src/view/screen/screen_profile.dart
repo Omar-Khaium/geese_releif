@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geesereleif/src/view/screen/screen_history.dart';
 import 'package:geesereleif/src/view/screen/screen_login.dart';
 import 'package:geesereleif/src/view/util/constraints.dart';
+import 'package:geesereleif/src/view/util/helper.dart';
 
 class ProfileScreen extends StatelessWidget {
   final String routeName = "/profile";
@@ -37,12 +38,13 @@ class ProfileScreen extends StatelessWidget {
                   MediaQuery.of(context).size.width * .34),
               child: Container(
                 decoration: BoxDecoration(color: Colors.grey.shade100),
-                child: Image.network(
-                  "https://uifaces.co/our-content/donated/8CEV1nXA.jpg",
+                child: user.profilePicture.contains("File") ? Image.network(
+                  user.profilePicture,
                   fit: BoxFit.cover,
-                  width: MediaQuery.of(context).size.width * .333,
-                  height: MediaQuery.of(context).size.width * .333,
-                ),
+                  width: MediaQuery.of(context).size.width * .34,
+                  height: MediaQuery.of(context).size.width * .34,
+                  filterQuality: FilterQuality.low,
+                ) : Icon(Icons.person,color: textColor,size: MediaQuery.of(context).size.width * .34,),
               ),
             ),
           ),
@@ -50,7 +52,7 @@ class ProfileScreen extends StatelessWidget {
             height: 8,
           ),
           Text(
-            "John Doe",
+            user.name,
             style: getAppBarTextStyle(context),
             textAlign: TextAlign.center,
           ),
@@ -145,7 +147,7 @@ class ProfileScreen extends StatelessWidget {
                         size: 18,
                       ),
                       title: Text(
-                        "(555) 010 9990",
+                        user.phone,
                         style: getDefaultTextStyle(context),
                       ),
                       dense: true,
@@ -157,7 +159,7 @@ class ProfileScreen extends StatelessWidget {
                         size: 18,
                       ),
                       title: Text(
-                        "john.doe@mail.com",
+                        user.email,
                         style: getDefaultTextStyle(context),
                       ),
                       dense: true,
@@ -169,11 +171,11 @@ class ProfileScreen extends StatelessWidget {
                         size: 18,
                       ),
                       title: Text(
-                        "22/B Old Baker Street",
+                        user.street,
                         style: getDefaultTextStyle(context),
                       ),
                       subtitle: Text(
-                        "South London, SC 21015",
+                        "${user.city}, ${user.state} ${user.zip}",
                         style: getDefaultTextStyle(context),
                       ),
                       dense: true,
@@ -185,7 +187,7 @@ class ProfileScreen extends StatelessWidget {
                         size: 18,
                       ),
                       title: Text(
-                        "29 Sep, 2019 8:05 AM",
+                        "${dateTimeToStringDate(stringToDateTime(user.lastUpdatedDate, ultimateDateFormat), "dd MMM, yyyy")} ${dateTimeToStringTime(stringToDateTime(user.lastUpdatedDate, ultimateDateFormat), "hh:mm a")}",
                         style: getDefaultTextStyle(context),
                       ),
                       subtitle: Text(
@@ -196,16 +198,16 @@ class ProfileScreen extends StatelessWidget {
                     ),
                     ListTile(
                       leading: Icon(
-                        FontAwesomeIcons.solidCalendarAlt,
+                        FontAwesomeIcons.briefcase,
                         color: textColor,
                         size: 18,
                       ),
                       title: Text(
-                        "01 Jan, 2014",
+                        user.companyName,
                         style: getDefaultTextStyle(context),
                       ),
                       subtitle: Text(
-                        "Employed Since",
+                        "${user.companyCity}, ${user.companyState} ${user.companyZip}",
                         style: getCaptionTextStyle(context),
                       ),
                       dense: true,

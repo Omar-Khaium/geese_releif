@@ -1,18 +1,29 @@
 
 import 'package:flutter/material.dart';
+import 'package:geesereleif/src/model/user.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-const String apiBaseUrl = "";
-const int tableUSER = 0;
+User user = User();
 
-const String ULTIMATE_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
+final String ultimateDateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS";
 
 
-//##################THEME############################
-Color backgroundColor = Colors.white;
-Color accentColor = Colors.blue;
-Color textColor = Colors.grey.shade900;
-Color hintColor = Colors.black26;
+//####################################THEME#####################################
+final Color backgroundColor = Colors.white;
+final Color accentColor = Colors.blue;
+final Color textColor = Colors.grey.shade900;
+final Color hintColor = Colors.black26;
+//##############################################################################
+
+
+//####################################-API-#####################################
+final String apiBaseUrl = "https://api.gratecrm.com/";
+final String apiToken = "token";
+final String apiUserInfo = "GetUserByUserName";
+final String apiRoutes = "GetOrganizationList";
+final String apiSelectRoutes = "ChangeDefaultCompany";
+final String apiCustomers = "GetAllCustomer";
+//##############################################################################
 
 enum LogType {
   CheckedIn,

@@ -192,7 +192,7 @@ class HistoryScreen extends StatelessWidget {
         actions: [
           ChoiceChip(
             label: Text(
-              "John Doe",
+              user.name.length>11 ? "${user.name.substring(0,11)}..." : user.name,
               style: getDefaultTextStyle(context),
             ),
             onSelected: (flag) => Navigator.of(context)
@@ -201,9 +201,13 @@ class HistoryScreen extends StatelessWidget {
             avatar: ClipRRect(
               borderRadius: BorderRadius.circular(32),
               clipBehavior: Clip.antiAliasWithSaveLayer,
-              child: Image.network(
-                "https://uifaces.co/our-content/donated/8CEV1nXA.jpg",
-              ),
+              child: user.profilePicture.contains("File") ? Image.network(
+                user.profilePicture,
+                fit: BoxFit.cover,
+                width: 32,
+                height: 32,
+                filterQuality: FilterQuality.low,
+              ) : Icon(Icons.person,color: textColor,),
             ),
             selected: false,
             elevation: 0,

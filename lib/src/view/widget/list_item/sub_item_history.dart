@@ -39,7 +39,7 @@ class HistorySubItem extends StatelessWidget {
                     ),
                     SizedBox(width: 2,),
                     Text(
-                      dateTimeToStringTime(stringToDateTime(historyItem.time, ULTIMATE_DATE_FORMAT), "hh:mm a"),
+                      dateTimeToStringTime(stringToDateTime(historyItem.time, ultimateDateFormat), "hh:mm a"),
                       style: getCaptionTextStyle(context),
                     ),
                   ],
