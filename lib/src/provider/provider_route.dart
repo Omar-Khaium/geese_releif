@@ -1,11 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
-import 'package:geesereleif/src/view/screen/screen_customers.dart';
-import 'package:geesereleif/src/view/util/constraints.dart';
+import 'package:geesereleif/src/util/constraints.dart';
 import 'package:http/http.dart';
 import 'package:geesereleif/src/model/route.dart';
-import 'package:geesereleif/src/view/util/network_helper.dart';
+import 'package:geesereleif/src/util/network_helper.dart';
 
 class RouteProvider extends ChangeNotifier {
   Map<String, Routes> routes = {};
@@ -15,6 +14,8 @@ class RouteProvider extends ChangeNotifier {
     try {
       Map<String, String> headers = {
         "Authorization": token,
+        "PageNo": "1",
+        "PageSize": "10",
       };
 
       Response response =
@@ -22,7 +23,7 @@ class RouteProvider extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         List<Map<String, dynamic>> result = List<Map<String, dynamic>>.from(
-            json.decode(response.body)["orglist"]);
+            json.decode(response.body)["RouteList"].toList());
         for (Map<String, dynamic> map in result) {
           Routes route = Routes.fromJson(map);
           if (!routes.containsKey(route.guid)) routes[route.guid] = route;
@@ -39,22 +40,31 @@ class RouteProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> selectRoutes(
-      BuildContext context, String token, String id) async {
+  Future<void> refreshRoutes(String token) async {
+    isLoading = true;
+    notifyListeners();
     try {
-      Map<String, String> headers = {'Authorization': token, 'Companyid': id};
+      Map<String, String> headers = {
+        "Authorization": token,
+        "PageNo": "1",
+        "PageSize": "10",
+      };
 
-      Map<String, String> body = {};
-
-      Response response = await NetworkHelper.apiPOST(
-          api: apiSelectRoutes, headers: headers, body: body);
+      Response response =
+          await NetworkHelper.apiGET(api: apiRoutes, headers: headers);
 
       if (response.statusCode == 200) {
-        Navigator.of(context).pop();
-        Navigator.of(context).pushNamed(CustomersScreen().routeName);
+        List<Map<String, dynamic>> result = List<Map<String, dynamic>>.from(
+            json.decode(response.body)["RouteList"].toList());
+        for (Map<String, dynamic> map in result) {
+          Routes route = Routes.fromJson(map);
+          if (!routes.containsKey(route.guid)) routes[route.guid] = route;
+        }
+        isLoading = false;
+        notifyListeners();
       } else {
         isLoading = false;
-        Navigator.of(context).pop();
+        notifyListeners();
       }
     } catch (error) {
       isLoading = false;

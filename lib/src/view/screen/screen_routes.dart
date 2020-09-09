@@ -2,13 +2,12 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geesereleif/src/provider/provider_route.dart';
 import 'package:geesereleif/src/view/screen/screen_customers.dart';
 import 'package:geesereleif/src/view/screen/screen_history.dart';
 import 'package:geesereleif/src/view/screen/screen_login.dart';
-import 'package:geesereleif/src/view/screen/screen_profile.dart';
-import 'package:geesereleif/src/view/util/constraints.dart';
-import 'package:geesereleif/src/view/widget/widget_loading.dart';
+import 'package:geesereleif/src/util/constraints.dart';
 import 'package:provider/provider.dart';
 
 class RoutesScreen extends StatelessWidget {
@@ -31,72 +30,29 @@ class RoutesScreen extends StatelessWidget {
           style: getAppBarTextStyle(context),
         ),
         actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 12),
-            child: ChoiceChip(
-              label: Text(
-                user.name.length > 11
-                    ? "${user.name.substring(0, 11)}..."
-                    : user.name,
-                style: getDefaultTextStyle(context),
-              ),
-              onSelected: (flag) {
-                showCupertinoModalPopup(
-                  context: context,
-                  filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
-                  builder: (context) => CupertinoActionSheet(
-                    actions: <Widget>[
-                      CupertinoActionSheetAction(
-                        child: Text(
-                          "Profile",
-                          style: getClickableTextStyle(context, forMenu: true),
-                        ),
-                        onPressed: () async {
-                          Navigator.of(context).pop();
-                          Navigator.of(context)
-                              .pushNamed(ProfileScreen().routeName);
-                        },
-                      ),
-                      CupertinoActionSheetAction(
-                        child: Text("History",
-                            style:
-                                getClickableTextStyle(context, forMenu: true)),
-                        onPressed: () async {
-                          Navigator.of(context).pop();
-                          Navigator.of(context)
-                              .pushNamed(HistoryScreen().routeName);
-                        },
-                      ),
-                    ],
-                    cancelButton: CupertinoActionSheetAction(
-                      child: Text(
-                        "Logout",
-                        style: getDeleteTextStyle(context),
-                      ),
-                      isDestructiveAction: true,
-                      onPressed: () {
-                        Navigator.of(context)
-                            .pushReplacementNamed(LoginScreen().routeName);
-                      },
-                    ),
-                  ),
-                );
-              },
-              clipBehavior: Clip.antiAliasWithSaveLayer,
-              avatar: ClipRRect(
-                borderRadius: BorderRadius.circular(32),
-                clipBehavior: Clip.antiAliasWithSaveLayer,
-                child: user.profilePicture.contains("File") ? Image.network(
-                  user.profilePicture,
-                  fit: BoxFit.cover,
-                  width: 32,
-                  height: 32,
-                  filterQuality: FilterQuality.low,
-                ) : Icon(Icons.person, color: textColor,),
-              ),
-              selected: false,
-              backgroundColor: Colors.grey.shade200,
-              elevation: 0,
+          ActionChip(
+            onPressed: () {
+              Navigator.of(context).pushNamed(HistoryScreen().routeName);
+            },
+            label: Text(
+              user.name.length > 11 ? "History" : user.name,
+              style: getDefaultTextStyle(context),
+            ),
+            labelPadding: const EdgeInsets.only(right: 4),
+            avatar: Icon(
+              FontAwesomeIcons.history,
+              size: 14,
+              color: Colors.grey.shade700,
+            ),
+            backgroundColor: Colors.grey.shade200,
+            elevation: 0,
+          ),
+          IconButton(
+            onPressed: () => Navigator.of(context)
+                .pushReplacementNamed(LoginScreen().routeName),
+            icon: Icon(
+              FontAwesomeIcons.signOutAlt,
+              color: Colors.black,
             ),
           ),
         ],
@@ -120,31 +76,37 @@ class RoutesScreen extends StatelessWidget {
                     style: getHintTextStyle(context),
                   ),
                 )
-              : ListView.separated(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.vertical,
-                  physics: ScrollPhysics(),
-                  separatorBuilder: (context, index) => Divider(
-                    color: hintColor,
-                    thickness: .25,
-                  ),
-                  itemBuilder: (context, index) => ListTile(
-                    dense: true,
-                    onTap: () {
-                      showDialog(context: context, builder: (context)=>Loading());
-                      routeProvider.selectRoutes(context, user.token, routeProvider.routeList[index].guid);
-                    },
-                    trailing: Icon(
-                      Icons.keyboard_arrow_right,
-                      size: 18,
+              : RefreshIndicator(
+                  onRefresh: () {
+                    return routeProvider.refreshRoutes(user.token);
+                  },
+                  child: ListView.separated(
+                    shrinkWrap: false,
+                    scrollDirection: Axis.vertical,
+                    physics: AlwaysScrollableScrollPhysics(),
+                    separatorBuilder: (context, index) => Divider(
                       color: hintColor,
+                      thickness: .25,
                     ),
-                    title: Text(
-                      routeProvider.routeList[index].name,
-                      style: getDefaultTextStyle(context, isFocused: true),
+                    itemBuilder: (context, index) => ListTile(
+                      dense: true,
+                      onTap: () {
+                        Navigator.of(context).pushNamed(
+                            CustomersScreen().routeName,
+                            arguments: routeProvider.routeList[index].guid);
+                      },
+                      trailing: Icon(
+                        Icons.keyboard_arrow_right,
+                        size: 18,
+                        color: hintColor,
+                      ),
+                      title: Text(
+                        routeProvider.routeList[index].name ?? "-",
+                        style: getDefaultTextStyle(context, isFocused: true),
+                      ),
                     ),
+                    itemCount: routeProvider.routeList.length,
                   ),
-                  itemCount: routeProvider.routeList.length,
                 ),
     );
   }

@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:geesereleif/src/model/user.dart';
 import 'package:geesereleif/src/provider/provider_route.dart';
 import 'package:geesereleif/src/view/screen/screen_routes.dart';
-import 'package:geesereleif/src/view/util/constraints.dart';
-import 'package:geesereleif/src/view/util/network_helper.dart';
+import 'package:geesereleif/src/util/constraints.dart';
+import 'package:geesereleif/src/util/network_helper.dart';
 import 'package:geesereleif/src/view/widget/widget_loading.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
@@ -16,8 +16,10 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<LoginForm> {
-  TextEditingController _usernameController = TextEditingController(text: "eashan.piistech@gmail.com");
-  TextEditingController _passwordController = TextEditingController(text: "123456");
+  TextEditingController _usernameController =
+      TextEditingController(text: "administrator");
+  TextEditingController _passwordController =
+      TextEditingController(text: "@AadGjMpTw9!");
   bool _isObscure = true;
   bool _isRemembered = false;
 
@@ -26,7 +28,7 @@ class _LoginFormState extends State<LoginForm> {
   @override
   Widget build(BuildContext context) {
     final routeProvider = Provider.of<RouteProvider>(context, listen: false);
-    Future.delayed(Duration(milliseconds: 0), (){
+    Future.delayed(Duration(milliseconds: 0), () {
       routeProvider.clear();
     });
     return Form(
@@ -138,31 +140,31 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   login() async {
-    try{
-    String username = _usernameController.text;
-    String password = _passwordController.text;
+    try {
+      String username = _usernameController.text;
+      String password = _passwordController.text;
 
-    Map<String, String> headers = {};
+      Map<String, String> headers = {};
 
-    Map<String, String> body = {
-      "username": username,
-      "password": password,
-      "grant_type": "password",
-    };
+      Map<String, String> body = {
+        "username": username,
+        "password": password,
+        "grant_type": "password",
+      };
 
-    Response response = await NetworkHelper.apiPOST(
-        api: apiToken, headers: headers, body: body);
+      Response response = await NetworkHelper.apiPOST(
+          api: apiToken, headers: headers, body: body);
 
-    if (response.statusCode == 200) {
-      Map<String, dynamic> result = json.decode(response.body);
-      user.email = username;
-      user.password = password;
-      user.token = "${result["token_type"]} ${result["access_token"]} ";
+      if (response.statusCode == 200) {
+        Map<String, dynamic> result = json.decode(response.body);
+        user.email = username;
+        user.password = password;
+        user.token = "${result["token_type"]} ${result["access_token"]} ";
 
-      getProfileData();
-    } else {
-      Navigator.of(context).pop();
-    }
+        getProfileData();
+      } else {
+        Navigator.of(context).pop();
+      }
     } catch (error) {
       print(error);
       Navigator.of(context).pop();

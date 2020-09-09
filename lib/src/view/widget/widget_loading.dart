@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:geesereleif/src/view/util/constraints.dart';
 
 class Loading extends StatelessWidget {
   @override

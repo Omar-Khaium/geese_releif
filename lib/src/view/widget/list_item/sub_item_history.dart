@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geesereleif/src/model/history_item.dart';
 import 'package:geesereleif/src/view/screen/screen_customer_details.dart';
-import 'package:geesereleif/src/view/util/constraints.dart';
-import 'package:geesereleif/src/view/util/helper.dart';
+import 'package:geesereleif/src/util/constraints.dart';
+import 'package:geesereleif/src/util/helper.dart';
 
 class HistorySubItem extends StatelessWidget {
   final HistoryItem historyItem;
@@ -32,14 +32,25 @@ class HistorySubItem extends StatelessWidget {
                   children: [
                     Transform.rotate(
                       child: Icon(
-                        historyItem.logType==LogType.Active ? Icons.fiber_manual_record : Icons.transit_enterexit,
-                        color: historyItem.logType==LogType.Active || historyItem.logType==LogType.CheckedIn ? Colors.green : Colors.red,
+                        historyItem.logType == LogType.Active
+                            ? Icons.fiber_manual_record
+                            : Icons.transit_enterexit,
+                        color: historyItem.logType == LogType.Active ||
+                                historyItem.logType == LogType.CheckedIn
+                            ? Colors.green
+                            : Colors.red,
                       ),
-                      angle: historyItem.logType==LogType.CheckedIn ?  -pi/2 : -pi,
+                      angle: historyItem.logType == LogType.CheckedIn
+                          ? -pi / 2
+                          : -pi,
                     ),
-                    SizedBox(width: 2,),
+                    SizedBox(
+                      width: 2,
+                    ),
                     Text(
-                      dateTimeToStringTime(stringToDateTime(historyItem.time, ultimateDateFormat), "hh:mm a"),
+                      dateTimeToStringTime(
+                              stringToDateTime(historyItem.time), "hh:mm a") ??
+                          "-",
                       style: getCaptionTextStyle(context),
                     ),
                   ],
@@ -62,14 +73,17 @@ class HistorySubItem extends StatelessWidget {
             child: InkWell(
               splashColor: Colors.transparent,
               highlightColor: Colors.transparent,
-              onTap: ()=>Navigator.of(context).pushNamed(CustomerDetailsScreen().routeName),
+              onTap: () => Navigator.of(context).pushNamed(
+                  CustomerDetailsScreen().routeName,
+                  arguments: historyItem.customer.guid),
               child: Container(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
                     color: Colors.grey.shade200,
                     borderRadius: BorderRadius.circular(12)),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 margin: const EdgeInsets.only(bottom: 6),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -88,8 +102,9 @@ class HistorySubItem extends StatelessWidget {
                         ),
                         SizedBox(
                           child: Text(
-                            historyItem.customer.name,
-                            style: getDefaultTextStyle(context, isFocused: false),
+                            historyItem.customer.name ?? "-",
+                            style:
+                                getDefaultTextStyle(context, isFocused: false),
                             overflow: TextOverflow.ellipsis,
                           ),
                           width: MediaQuery.of(context).size.width * .7 - 72,

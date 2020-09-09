@@ -1,11 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geesereleif/src/model/customer.dart';
-import 'package:geesereleif/src/model/history.dart';
 import 'package:geesereleif/src/view/screen/screen_customer_details.dart';
-import 'package:geesereleif/src/view/util/constraints.dart';
-import 'package:geesereleif/src/view/util/helper.dart';
-import 'package:geesereleif/src/view/widget/list_item/sub_item_history.dart';
+import 'package:geesereleif/src/util/constraints.dart';
+import 'package:geesereleif/src/util/helper.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 
 class CustomerItem extends StatelessWidget {
@@ -18,7 +16,8 @@ class CustomerItem extends StatelessWidget {
     return ListTile(
       dense: true,
       onTap: () {
-        Navigator.of(context).pushNamed(CustomerDetailsScreen().routeName, arguments: customer.guid);
+        Navigator.of(context).pushNamed(CustomerDetailsScreen().routeName,
+            arguments: customer.guid);
       },
       trailing: Icon(
         Icons.keyboard_arrow_right,
@@ -35,7 +34,7 @@ class CustomerItem extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               SizedBox(
-                width: MediaQuery.of(context).size.width*.4,
+                width: MediaQuery.of(context).size.width * .4,
                 child: Text(
                   customer.name,
                   style: getDefaultTextStyle(context, isFocused: true),
@@ -58,10 +57,11 @@ class CustomerItem extends StatelessWidget {
             splashColor: Colors.transparent,
             highlightColor: Colors.transparent,
             onTap: () {
-              MapsLauncher.launchQuery("${customer.street}\n${customer.city}, ${customer.state} ${customer.zip}");
+              MapsLauncher.launchQuery(
+                  "${customer.street}\n${customer.city}, ${customer.state} ${customer.zip}");
             },
             child: SizedBox(
-              width: MediaQuery.of(context).size.width*.35,
+              width: MediaQuery.of(context).size.width * .35,
               child: Text(
                 "${customer.street}\n${customer.city}, ${customer.state} ${customer.zip}",
                 style: getClickableTextStyle(context),
@@ -75,7 +75,9 @@ class CustomerItem extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            "${dateTimeToStringDate(stringToDateTime(customer.lastCheckIn, ultimateDateFormat), "dd MMM, yyyy")} ${dateTimeToStringTime(stringToDateTime(customer.lastCheckIn, ultimateDateFormat), "hh:mm a")}",
+            customer.lastCheckIn.startsWith("20")
+                ? "${dateTimeToStringDate(stringToDateTime(customer.lastCheckIn), "dd MMM, yyyy")} ${dateTimeToStringTime(stringToDateTime(customer.lastCheckIn), "hh:mm a")}"
+                : "no check-in record found",
             style: getCaptionTextStyle(context),
           ),
           Text(

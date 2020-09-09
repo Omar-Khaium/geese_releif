@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geesereleif/src/model/history.dart';
-import 'package:geesereleif/src/view/util/constraints.dart';
-import 'package:geesereleif/src/view/util/helper.dart';
+import 'package:geesereleif/src/util/constraints.dart';
+import 'package:geesereleif/src/util/helper.dart';
 import 'package:geesereleif/src/view/widget/list_item/sub_item_history.dart';
 
 class HistoryItem extends StatelessWidget {
@@ -19,11 +19,14 @@ class HistoryItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            dateTimeToStringDate(stringToDateTime(history.dateTime, ultimateDateFormat), "MM/dd/yyyy"),
+            dateTimeToStringDate(
+                stringToDateTime(history.dateTime),
+                "MM/dd/yyyy") ?? "-",
             style: getDefaultTextStyle(context, isFocused: true),
           ),
           ListView.builder(
-            itemBuilder: (context, index) => HistorySubItem(history.items[index], index==history.items.length-1),
+            itemBuilder: (context, index) => HistorySubItem(
+                history.items[index], index == history.items.length - 1),
             itemCount: history.items.length,
             shrinkWrap: true,
             scrollDirection: Axis.vertical,

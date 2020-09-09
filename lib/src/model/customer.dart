@@ -1,37 +1,68 @@
+import 'package:geesereleif/src/model/note.dart';
+import 'package:geesereleif/src/model/media_file.dart';
+
 class Customer {
   String guid;
+  String routeId;
   String name;
   String phone;
+  String email;
   String street;
   String city;
   String state;
   String zip;
   String lead;
   String lastCheckIn;
+  bool isCheckedIn;
   int geeseCount;
+  List<MediaFile> mediaList = [];
+  List<Note> noteList = [];
 
   Customer(
       {this.guid,
+      this.routeId,
       this.name,
       this.phone,
+      this.email,
       this.street,
       this.city,
       this.state,
       this.zip,
       this.lead,
       this.lastCheckIn,
-      this.geeseCount});
+      this.geeseCount,
+      this.mediaList,
+      this.noteList});
 
-  Customer.fromJson(Map<String, dynamic> json) {
-    guid = json["CustomerId"];
-    name = "${json["FirstName"]} ${json["LastName"]}";
-    lead = json["Type"];
-    phone = json["PrimaryPhone"];
-    street = json["Street"];
-    city = json["City"];
-    state = json["State"];
-    zip = json["ZipCode"];
-    lastCheckIn = json["CreatedDate"];
-    geeseCount = json["CreditScoreValue"];
+  Customer.fromJson(
+      Map<String, dynamic> customer,
+      List<Map<String, dynamic>> mediaJson,
+      List<Map<String, dynamic>> noteJson,
+      String routeId) {
+    try {
+      guid = customer["CustomerId"];
+      this.routeId = routeId;
+      name = customer["Name"];
+      lead = customer["GeeseLead"];
+      phone = customer["Phone"];
+      email = customer["Email"];
+      street = customer["Street"];
+      city = customer["City"];
+      state = customer["State"];
+      zip = customer["Zip"];
+      lastCheckIn = customer["LastCheckedInTime"];
+      geeseCount = customer["GeeseCount"];
+      isCheckedIn = customer["IsCheckedIn"];
+
+      noteJson.forEach((element) {
+        noteList.add(Note.fromJson(Map<String, dynamic>.from(element)));
+      });
+
+      mediaJson.forEach((element) {
+        mediaList.add(MediaFile.fromJson(Map<String, dynamic>.from(element)));
+      });
+    } catch (error) {
+      print(error);
+    }
   }
 }

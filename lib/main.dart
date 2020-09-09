@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geesereleif/src/provider/provider_customer.dart';
+import 'package:geesereleif/src/provider/provider_history.dart';
 import 'package:geesereleif/src/provider/provider_keyboard.dart';
 import 'package:geesereleif/src/provider/provider_route.dart';
 import 'package:geesereleif/src/view/screen/screen_customer_details.dart';
@@ -8,10 +9,9 @@ import 'package:geesereleif/src/view/screen/screen_history.dart';
 import 'package:geesereleif/src/view/screen/screen_login.dart';
 import 'package:geesereleif/src/view/screen/screen_onboard.dart';
 import 'package:geesereleif/src/view/screen/screen_photo_preview.dart';
-import 'package:geesereleif/src/view/screen/screen_profile.dart';
 import 'package:geesereleif/src/view/screen/screen_routes.dart';
 import 'package:geesereleif/src/view/screen/screen_upload_file.dart';
-import 'package:geesereleif/src/view/util/constraints.dart';
+import 'package:geesereleif/src/util/constraints.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -31,6 +31,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (context) => CustomerProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => HistoryProvider(),
         ),
       ],
       child: MaterialApp(
@@ -55,7 +58,6 @@ class MyApp extends StatelessWidget {
               CustomerDetailsScreen(),
           UploadFileScreen().routeName: (context) => UploadFileScreen(),
           ViewPhotoScreen().routeName: (context) => ViewPhotoScreen(),
-          ProfileScreen().routeName: (context) => ProfileScreen(),
           HistoryScreen().routeName: (context) => HistoryScreen(),
         },
       ),
@@ -64,7 +66,6 @@ class MyApp extends StatelessWidget {
 }
 
 class HomeScreen extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     final keyboardProvider =

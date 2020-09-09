@@ -47,7 +47,7 @@ class User {
   User.fromJson(Map<String, dynamic> json, User old) {
     id = json["emp"]["Id"];
     guid = json["emp"]["UserId"];
-    profilePicture = "http://gratecrm.com${json["emp"]["ProfilePicture"]}";
+    profilePicture = "http://app.rmrcloud.com${json["emp"]["ProfilePicture"]}";
     name = "${json["emp"]["FirstName"]} ${json["emp"]["LastName"]}";
     phone = json["emp"]["Phone"];
     street = json["emp"]["Street"];
@@ -58,7 +58,7 @@ class User {
     email = old.email;
     token = old.token;
     password = old.password;
-    companyLogo = "http://gratecrm.com${json["company"]["CompanyLogo"]}";
+    companyLogo = "http://app.rmrcloud.com${json["company"]["CompanyLogo"]}";
     companyName = json["company"]["CompanyName"];
     companyGUID = json["company"]["CompanyId  "];
     companyCity = json["company"]["City"];

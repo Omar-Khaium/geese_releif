@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geesereleif/src/provider/provider_keyboard.dart';
-import 'package:geesereleif/src/view/util/constraints.dart';
-import 'package:geesereleif/src/view/util/helper.dart';
+import 'package:geesereleif/src/util/constraints.dart';
 import 'package:geesereleif/src/view/widget/widget_login.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -22,13 +21,18 @@ class LoginScreen extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Image.asset("images/logo.png", width: 144, fit: BoxFit.contain,),
+                  Image.asset(
+                    "images/logo.png",
+                    width: 144,
+                    fit: BoxFit.contain,
+                  ),
                   Container(
                     width: 320,
                     height: 320,
                     margin: const EdgeInsets.only(top: 36),
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    decoration: BoxDecoration(color: backgroundColor, boxShadow: [
+                    decoration:
+                        BoxDecoration(color: backgroundColor, boxShadow: [
                       BoxShadow(
                           offset: Offset(0, 0),
                           color: Colors.black12,
@@ -49,7 +53,8 @@ class LoginScreen extends StatelessWidget {
                 child: InkWell(
                   onTap: () {
                     keyboardProvider.hideKeyboard(context);
-                    launch("https://www.geeserelief.com/about-us/privacy.html", forceSafariVC: true);
+                    launch("https://www.geeserelief.com/about-us/privacy.html",
+                        forceSafariVC: true);
                   },
                   child: Padding(
                     padding:

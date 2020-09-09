@@ -4,13 +4,17 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:geesereleif/src/model/note.dart';
 import 'package:geesereleif/src/model/customer.dart';
+import 'package:geesereleif/src/model/history.dart';
 import 'package:geesereleif/src/provider/provider_customer.dart';
+import 'package:geesereleif/src/provider/provider_history.dart';
+import 'package:geesereleif/src/provider/provider_keyboard.dart';
 import 'package:geesereleif/src/view/screen/screen_upload_file.dart';
-import 'package:geesereleif/src/view/util/constraints.dart';
-import 'package:geesereleif/src/view/util/helper.dart';
+import 'package:geesereleif/src/util/constraints.dart';
+import 'package:geesereleif/src/util/helper.dart';
 import 'package:geesereleif/src/view/widget/bottom_sheet_check_in.dart';
-import 'package:geesereleif/src/view/widget/bottom_sheet_comments.dart';
+import 'package:geesereleif/src/view/widget/bottom_sheet_notes.dart';
 import 'package:geesereleif/src/view/widget/bottom_sheet_media.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -35,7 +39,11 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
   Widget build(BuildContext context) {
     final String id = ModalRoute.of(context).settings.arguments as String;
     final customerProvider =
-        Provider.of<CustomerProvider>(context, listen: false);
+        Provider.of<CustomerProvider>(context, listen: true);
+    final historyProvider =
+        Provider.of<HistoryProvider>(context, listen: false);
+    final keyboardProvider =
+        Provider.of<KeyboardProvider>(context, listen: true);
     final Customer customer = customerProvider.findCustomerByID(id);
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -56,7 +64,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                     ),
                     onPressed: () async {
                       Navigator.of(context).pop();
-                      getImage(ImageSource.camera);
+                      getImage(ImageSource.camera, customer.guid);
                     },
                   ),
                   CupertinoActionSheetAction(
@@ -64,7 +72,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                         style: getClickableTextStyle(context, forMenu: true)),
                     onPressed: () async {
                       Navigator.of(context).pop();
-                      getImage(ImageSource.gallery);
+                      getImage(ImageSource.gallery, customer.guid);
                     },
                   ),
                 ],
@@ -101,22 +109,6 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
           style: getAppBarTextStyle(context),
           overflow: TextOverflow.ellipsis,
         ),
-        actions: [
-          Center(
-            child: Container(
-              margin: EdgeInsets.only(right: 16),
-              height: 22,
-              width: 84,
-              decoration: BoxDecoration(
-                  color: Colors.orange, borderRadius: BorderRadius.circular(4)),
-              child: Center(
-                  child: Text(
-                customer.lead,
-                style: getBadgeTextStyle(context),
-              )),
-            ),
-          )
-        ],
       ),
       body: Stack(
         children: [
@@ -134,19 +126,22 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                 children: [
                   ListTile(
                     leading: Icon(
-                      FontAwesomeIcons.solidUser,
+                      FontAwesomeIcons.tag,
                       color: textColor,
                       size: 18,
                     ),
                     title: Text(
-                      customer.name,
+                      customer.lead.isNotEmpty
+                          ? customer.lead
+                          : "lead type unavailable",
                       style: getDefaultTextStyle(context),
                     ),
                     dense: true,
                   ),
                   ListTile(
                     onTap: () {
-                      launch("tel:${customer.phone}");
+                      if (customer.phone.isNotEmpty)
+                        launch("tel:${customer.phone}");
                     },
                     leading: Icon(
                       FontAwesomeIcons.phoneAlt,
@@ -154,14 +149,17 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                       size: 18,
                     ),
                     title: Text(
-                      customer.phone,
+                      customer.phone.isEmpty
+                          ? "phone number unavailable"
+                          : customer.phone ?? "-",
                       style: getDefaultTextStyle(context),
                     ),
                     dense: true,
                   ),
                   ListTile(
                     onTap: () {
-                      MapsLauncher.launchQuery("${customer.street}\n${customer.city}, ${customer.state.toUpperCase()} ${customer.zip}");
+                      MapsLauncher.launchQuery(
+                          "${customer.street}\n${customer.city}, ${customer.state.toUpperCase()} ${customer.zip}");
                     },
                     leading: Icon(
                       FontAwesomeIcons.mapMarkerAlt,
@@ -169,7 +167,9 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                       size: 18,
                     ),
                     title: Text(
-                      customer.street,
+                      customer.street.isEmpty
+                          ? "street not found"
+                          : customer.street,
                       style: getDefaultTextStyle(context),
                     ),
                     subtitle: Text(
@@ -185,7 +185,9 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                       size: 18,
                     ),
                     title: Text(
-                      "${dateTimeToStringDate(stringToDateTime(customer.lastCheckIn, ultimateDateFormat), "dd MMM, yyyy")} ${dateTimeToStringTime(stringToDateTime(customer.lastCheckIn, ultimateDateFormat), "hh:mm a")}",
+                      customer.lastCheckIn.startsWith("20")
+                          ? "${dateTimeToStringDate(stringToDateTime(customer.lastCheckIn), "dd MMM, yyyy")} ${dateTimeToStringTime(stringToDateTime(customer.lastCheckIn), "hh:mm a")}"
+                          : "no check-in record found",
                       style: getDefaultTextStyle(context),
                     ),
                     dense: true,
@@ -222,7 +224,60 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                           borderSide: BorderSide(color: accentColor, width: 2),
                         ),
                         suffixIcon: IconButton(
-                          onPressed: () {},
+                          disabledColor: hintColor,
+                          color: accentColor,
+                          onPressed: _noteController.text.isEmpty
+                              ? null
+                              : () async {
+                                  keyboardProvider.hideKeyboard(context);
+                                  showDialog(
+                                      context: context,
+                                      barrierDismissible: false,
+                                      builder: (context) => WillPopScope(
+                                            onWillPop: () async => false,
+                                            child: BackdropFilter(
+                                              filter: ImageFilter.blur(
+                                                  sigmaX: 4, sigmaY: 4),
+                                              child: AlertDialog(
+                                                elevation: 0,
+                                                backgroundColor:
+                                                    Colors.transparent,
+                                                content: Container(
+                                                  width: 144,
+                                                  height: 144,
+                                                  child: Image.asset(
+                                                    "images/loading.gif",
+                                                    fit: BoxFit.contain,
+                                                    filterQuality:
+                                                        FilterQuality.high,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ));
+                                  bool response =
+                                      await customerProvider.sendNote(
+                                          user.token,
+                                          id,
+                                          user.guid,
+                                          customer.guid,
+                                          _noteController.text);
+                                  Navigator.of(context).pop();
+                                  if (response) {
+                                    customerProvider.newNote(
+                                      customer.guid,
+                                      Note(
+                                        _noteController.text,
+                                        DateTime.now().toIso8601String(),
+                                      ),
+                                    );
+                                    setState(() {
+                                      _noteController.text = "";
+                                    });
+                                  }
+                                  FocusScope.of(context)
+                                      .requestFocus(FocusNode());
+                                },
                           icon: Icon(
                             FontAwesomeIcons.share,
                             size: 20,
@@ -238,107 +293,115 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                   SizedBox(
                     height: 12,
                   ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      InkWell(
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (context) => PhotoPreview(),
-                          );
-                        },
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * .4,
-                          height: MediaQuery.of(context).size.width * .3,
-                          decoration: BoxDecoration(
-                            color: backgroundColor,
-                            boxShadow: [
-                              BoxShadow(
-                                offset: Offset(0, 0),
-                                color: Colors.grey.shade200,
-                                spreadRadius: 4,
-                                blurRadius: 4,
-                              )
-                            ],
-                          ),
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  FontAwesomeIcons.solidImages,
-                                  size: 20,
-                                  color: accentColor,
-                                ),
-                                SizedBox(
-                                  height: 4,
-                                ),
-                                Text(
-                                  "13",
-                                  style: getClickableTextStyle(context,
-                                      forCount: true),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 24,
-                      ),
-                      InkWell(
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () {
-                          showModalBottomSheet(
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 0,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        InkWell(
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          onTap: () {
+                            showModalBottomSheet(
                               context: context,
-                              builder: (context) => CommentsPreview());
-                        },
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * .4,
-                          height: MediaQuery.of(context).size.width * .3,
-                          decoration: BoxDecoration(
-                            color: backgroundColor,
-                            boxShadow: [
-                              BoxShadow(
-                                offset: Offset(0, 0),
-                                color: Colors.grey.shade200,
-                                spreadRadius: 4,
-                                blurRadius: 4,
-                              )
-                            ],
-                          ),
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  FontAwesomeIcons.solidComments,
-                                  size: 20,
-                                  color: accentColor,
-                                ),
-                                SizedBox(
-                                  height: 4,
-                                ),
-                                Text(
-                                  "24",
-                                  style: getClickableTextStyle(context,
-                                      forCount: true),
-                                ),
+                              builder: (context) =>
+                                  PhotoPreview(customer.mediaList),
+                            );
+                          },
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * .4,
+                            height: MediaQuery.of(context).size.width * .3,
+                            decoration: BoxDecoration(
+                              color: backgroundColor,
+                              boxShadow: [
+                                BoxShadow(
+                                  offset: Offset(0, 0),
+                                  color: Colors.grey.shade200,
+                                  spreadRadius: 4,
+                                  blurRadius: 4,
+                                )
                               ],
+                            ),
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    FontAwesomeIcons.solidImages,
+                                    size: 20,
+                                    color: accentColor,
+                                  ),
+                                  SizedBox(
+                                    height: 4,
+                                  ),
+                                  Text(
+                                    customer.mediaList.length.toString(),
+                                    style: getClickableTextStyle(context,
+                                        forCount: true),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                        SizedBox(
+                          width: 24,
+                        ),
+                        InkWell(
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          onTap: () {
+                            showModalBottomSheet(
+                                context: context,
+                                builder: (context) =>
+                                    NotesPreview(customer.noteList));
+                          },
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * .4,
+                            height: MediaQuery.of(context).size.width * .3,
+                            decoration: BoxDecoration(
+                              color: backgroundColor,
+                              boxShadow: [
+                                BoxShadow(
+                                  offset: Offset(0, 0),
+                                  color: Colors.grey.shade200,
+                                  spreadRadius: 4,
+                                  blurRadius: 4,
+                                )
+                              ],
+                            ),
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    FontAwesomeIcons.solidComments,
+                                    size: 20,
+                                    color: accentColor,
+                                  ),
+                                  SizedBox(
+                                    height: 4,
+                                  ),
+                                  Text(
+                                    customer.noteList.length.toString(),
+                                    style: getClickableTextStyle(context,
+                                        forCount: true),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -350,25 +413,70 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
             right: 0,
             child: Container(
               height: 54,
-              decoration: BoxDecoration(color: accentColor, boxShadow: [
-                BoxShadow(
-                    offset: Offset(0, 1),
-                    color: Colors.grey.shade100,
-                    spreadRadius: 8,
-                    blurRadius: 8)
-              ]),
+              decoration: BoxDecoration(
+                  color: customer.isCheckedIn ? Colors.red : accentColor,
+                  boxShadow: [
+                    BoxShadow(
+                        offset: Offset(0, 1),
+                        color: Colors.grey.shade100,
+                        spreadRadius: 8,
+                        blurRadius: 8)
+                  ]),
               child: InkWell(
-                onTap: () {
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (context) => CheckIn(),
-                  );
+                onTap: () async {
+                  if (!customer.isCheckedIn) {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (context) => Padding(
+                        padding: MediaQuery.of(context).viewInsets,
+                        child: CheckIn(
+                          customer,
+                          customerProvider,
+                          onSave: (count) {
+                            customerProvider.newCheckIn(customer.guid, count);
+                            historyProvider.newCheckIn(customer);
+                          },
+                        ),
+                      ),
+                    );
+                  } else {
+                    showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (context) => WillPopScope(
+                              onWillPop: () async => false,
+                              child: BackdropFilter(
+                                filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                                child: AlertDialog(
+                                  elevation: 0,
+                                  backgroundColor: Colors.transparent,
+                                  content: Container(
+                                    width: 144,
+                                    height: 144,
+                                    child: Image.asset(
+                                      "images/loading.gif",
+                                      fit: BoxFit.contain,
+                                      filterQuality: FilterQuality.high,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ));
+                    bool result = await customerProvider.checkOut(
+                        user.token, user.guid, customer.guid);
+                    if (result) {
+                      customerProvider.newCheckOut(customer.guid);
+                      historyProvider.newCheckOut(customer);
+                    }
+                    Navigator.of(context).pop();
+                  }
                 },
                 splashColor: Colors.black,
                 highlightColor: Colors.white,
                 child: Center(
                   child: Text(
-                    "Check In",
+                    "Check ${customer.isCheckedIn ? "out" : "in"}",
                     style: getButtonTextStyle(context, isOutline: false),
                   ),
                 ),
@@ -380,43 +488,52 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
     );
   }
 
-  Future getImage(source) async {
+  Future getImage(source, customerId) async {
     final pickedFile = await picker.getImage(source: source);
 
     setState(() {
       _image = File(pickedFile.path);
     });
     _image = await ImageCropper.cropImage(
-        sourcePath: _image.path,
-        aspectRatioPresets: Platform.isAndroid
-            ? [
-                CropAspectRatioPreset.square,
-                CropAspectRatioPreset.ratio3x2,
-                CropAspectRatioPreset.original,
-                CropAspectRatioPreset.ratio4x3,
-                CropAspectRatioPreset.ratio16x9
-              ]
-            : [
-                CropAspectRatioPreset.original,
-                CropAspectRatioPreset.square,
-                CropAspectRatioPreset.ratio3x2,
-                CropAspectRatioPreset.ratio4x3,
-                CropAspectRatioPreset.ratio5x3,
-                CropAspectRatioPreset.ratio5x4,
-                CropAspectRatioPreset.ratio7x5,
-                CropAspectRatioPreset.ratio16x9
-              ],
-        androidUiSettings: AndroidUiSettings(
-            toolbarTitle: 'Adjust Image',
-            toolbarColor: Colors.deepOrange,
-            toolbarWidgetColor: Colors.white,
-            initAspectRatio: CropAspectRatioPreset.original,
-            lockAspectRatio: false),
-        iosUiSettings: IOSUiSettings(
-          title: 'Adjust Image',
-        ));
+      sourcePath: _image.path,
+      aspectRatioPresets: Platform.isAndroid
+          ? [
+              CropAspectRatioPreset.square,
+              CropAspectRatioPreset.ratio3x2,
+              CropAspectRatioPreset.original,
+              CropAspectRatioPreset.ratio4x3,
+              CropAspectRatioPreset.ratio16x9
+            ]
+          : [
+              CropAspectRatioPreset.original,
+              CropAspectRatioPreset.square,
+              CropAspectRatioPreset.ratio3x2,
+              CropAspectRatioPreset.ratio4x3,
+              CropAspectRatioPreset.ratio5x3,
+              CropAspectRatioPreset.ratio5x4,
+              CropAspectRatioPreset.ratio7x5,
+              CropAspectRatioPreset.ratio16x9
+            ],
+      androidUiSettings: AndroidUiSettings(
+          toolbarTitle: 'Adjust Image',
+          toolbarColor: Colors.blue,
+          activeControlsWidgetColor: Colors.blue,
+          cropFrameColor: Colors.blue,
+          backgroundColor: Colors.black,
+          statusBarColor: Colors.blue,
+          toolbarWidgetColor: Colors.white,
+          initAspectRatio: CropAspectRatioPreset.original,
+          showCropGrid: true,
+          lockAspectRatio: false),
+      iosUiSettings: IOSUiSettings(
+        title: 'Adjust Image',
+        showCancelConfirmationDialog: true,
+      ),
+    );
 
-    Navigator.of(context)
-        .pushNamed(UploadFileScreen().routeName, arguments: _image);
+    Navigator.of(context).pushNamed(UploadFileScreen().routeName, arguments: {
+      "image": _image,
+      "customerId": customerId,
+    });
   }
 }
