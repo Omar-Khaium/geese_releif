@@ -3,8 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:geesereleif/src/model/customer.dart';
-import 'package:geesereleif/src/model/media_file.dart';
 import 'package:geesereleif/src/provider/provider_customer.dart';
 import 'package:geesereleif/src/util/constraints.dart';
 import 'package:geesereleif/src/util/network_helper.dart';
@@ -14,6 +12,7 @@ import 'package:provider/provider.dart';
 
 class UploadFileScreen extends StatelessWidget {
   final String routeName = "/upload_file";
+
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> data =
@@ -51,8 +50,8 @@ class UploadFileScreen extends StatelessWidget {
               child: FlatButton(
                 color: accentColor,
                 onPressed: () {
-                  showDialog(context: context, builder: (context) => Loading());
-                  uploadImage(context, image, customerId, customerProvider);
+                  showDialog(context: context, builder: (context) => Loading(Colors.blue));
+                  customerProvider.uploadImage(context, image, customerId, customerProvider);
                 },
                 child: Text(
                   "Upload",
@@ -83,63 +82,5 @@ class UploadFileScreen extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Future<void> saveImage(
-    BuildContext context,
-    String path,
-    String customerId,
-    CustomerProvider customerProvider,
-  ) async {
-    try {
-      Map<String, String> headers = {
-        "Authorization": user.token,
-        "CustomerId": customerId,
-        "Path": path,
-      };
-
-      Response response =
-          await NetworkHelper.apiPOST(api: apiSaveMedia, headers: headers);
-
-      if (response.statusCode == 200) {
-        customerProvider.newMedia(customerId, apiBaseUrl+path);
-        Navigator.of(context).pop();
-        Navigator.of(context).pop();
-      } else {
-        Navigator.of(context).pop();
-      }
-    } catch (error) {
-      Navigator.of(context).pop();
-    }
-  }
-
-  Future<void> uploadImage(
-    BuildContext context,
-    File image,
-    String customerId,
-    CustomerProvider customerProvider,
-  ) async {
-    try {
-      Map<String, String> headers = {
-        "Authorization": user.token,
-        "Content-Type": "application/x-www-form-urlencoded",
-      };
-      Map<String, String> body = {
-        "filename": "${DateTime.now().millisecondsSinceEpoch}.png",
-        "filepath": base64.encode(image.readAsBytesSync()),
-      };
-
-      Response response = await NetworkHelper.apiPOST(
-          api: apiUpload, headers: headers, body: body);
-
-      if (response.statusCode == 200) {
-        var result = json.decode(response.body);
-        saveImage(context, result["filePath"], customerId, customerProvider);
-      } else {
-        Navigator.of(context).pop();
-      }
-    } catch (error) {
-      Navigator.of(context).pop();
-    }
   }
 }

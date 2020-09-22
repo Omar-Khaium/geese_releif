@@ -5,6 +5,7 @@ import 'package:geesereleif/src/provider/provider_history.dart';
 import 'package:geesereleif/src/view/screen/screen_login.dart';
 import 'package:geesereleif/src/util/constraints.dart';
 import 'package:geesereleif/src/view/widget/list_item/item_history.dart';
+import 'package:geesereleif/src/view/widget/shimmer/shimmer_history.dart';
 import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
@@ -16,8 +17,9 @@ class HistoryScreen extends StatelessWidget {
     final customerProvider =
         Provider.of<CustomerProvider>(context, listen: false);
     final historyProvider = Provider.of<HistoryProvider>(context, listen: true);
+    historyProvider.init();
     if (historyProvider.getAllHistories.length == 0) {
-      historyProvider.getHistory(user.token, user.guid, customerProvider);
+      historyProvider.getHistory(customerProvider);
     }
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -64,24 +66,17 @@ class HistoryScreen extends StatelessWidget {
         // ),
         actions: [
           IconButton(
-            onPressed: () => Navigator.of(context)
-                .pushReplacementNamed(LoginScreen().routeName),
+            onPressed: () {
+              historyProvider.logout();
+              Navigator.of(context)
+                  .pushReplacementNamed(LoginScreen().routeName);
+            },
             icon: Icon(FontAwesomeIcons.signOutAlt, color: Colors.black),
           ),
         ],
       ),
       body: historyProvider.isLoading
-          ? Center(
-              child: Container(
-                width: 144,
-                height: 144,
-                child: Image.asset(
-                  "images/loading.gif",
-                  fit: BoxFit.cover,
-                  filterQuality: FilterQuality.high,
-                ),
-              ),
-            )
+          ? ShimmerHistory()
           : historyProvider.getAllHistories.length == 0
               ? Center(
                   child: Text(
@@ -91,8 +86,7 @@ class HistoryScreen extends StatelessWidget {
                 )
               : RefreshIndicator(
                   onRefresh: () {
-                    return historyProvider.refreshHistory(
-                        user.token, user.guid, customerProvider);
+                    return historyProvider.refreshHistory(customerProvider);
                   },
                   child: ListView.builder(
                     shrinkWrap: false,

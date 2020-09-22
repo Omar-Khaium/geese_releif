@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geesereleif/src/model/note.dart';
 import 'package:geesereleif/src/model/customer.dart';
-import 'package:geesereleif/src/model/history.dart';
 import 'package:geesereleif/src/provider/provider_customer.dart';
 import 'package:geesereleif/src/provider/provider_history.dart';
 import 'package:geesereleif/src/provider/provider_keyboard.dart';
@@ -204,8 +203,11 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                     ),
                     dense: true,
                   ),
+                  SizedBox(
+                    height: 12,
+                  ),
                   Container(
-                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
                     child: TextField(
                       controller: _noteController,
                       keyboardType: TextInputType.multiline,
@@ -213,6 +215,11 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                       textAlign: TextAlign.justify,
                       textAlignVertical: TextAlignVertical.top,
                       maxLines: 4,
+                      onChanged: (text){
+                        setState(() {
+
+                        });
+                      },
                       style: getDefaultTextStyle(context),
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
@@ -223,70 +230,64 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                           borderRadius: BorderRadius.circular(0),
                           borderSide: BorderSide(color: accentColor, width: 2),
                         ),
-                        suffixIcon: IconButton(
-                          disabledColor: hintColor,
-                          color: accentColor,
-                          onPressed: _noteController.text.isEmpty
-                              ? null
-                              : () async {
-                                  keyboardProvider.hideKeyboard(context);
-                                  showDialog(
-                                      context: context,
-                                      barrierDismissible: false,
-                                      builder: (context) => WillPopScope(
-                                            onWillPop: () async => false,
-                                            child: BackdropFilter(
-                                              filter: ImageFilter.blur(
-                                                  sigmaX: 4, sigmaY: 4),
-                                              child: AlertDialog(
-                                                elevation: 0,
-                                                backgroundColor:
-                                                    Colors.transparent,
-                                                content: Container(
-                                                  width: 144,
-                                                  height: 144,
-                                                  child: Image.asset(
-                                                    "images/loading.gif",
-                                                    fit: BoxFit.contain,
-                                                    filterQuality:
-                                                        FilterQuality.high,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ));
-                                  bool response =
-                                      await customerProvider.sendNote(
-                                          user.token,
-                                          id,
-                                          user.guid,
-                                          customer.guid,
-                                          _noteController.text);
-                                  Navigator.of(context).pop();
-                                  if (response) {
-                                    customerProvider.newNote(
-                                      customer.guid,
-                                      Note(
-                                        _noteController.text,
-                                        DateTime.now().toIso8601String(),
-                                      ),
-                                    );
-                                    setState(() {
-                                      _noteController.text = "";
-                                    });
-                                  }
-                                  FocusScope.of(context)
-                                      .requestFocus(FocusNode());
-                                },
-                          icon: Icon(
-                            FontAwesomeIcons.share,
-                            size: 20,
-                            color: accentColor,
-                          ),
-                        ),
                         hintText: "Write a note...",
                         hintStyle: getHintTextStyle(context),
                         isDense: true,
+                      ),
+                    ),
+                  ),
+                  Visibility(
+                    visible: _noteController.text.isNotEmpty,
+                    child: Container(
+                      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                      child: FlatButton(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        onPressed: () async {
+                          keyboardProvider.hideKeyboard(context);
+                          showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) => WillPopScope(
+                                onWillPop: () async => false,
+                                child: BackdropFilter(
+                                  filter: ImageFilter.blur(
+                                      sigmaX: 4, sigmaY: 4),
+                                  child: AlertDialog(
+                                    elevation: 0,
+                                    backgroundColor:
+                                    Colors.transparent,
+                                    content: Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  ),
+                                ),
+                              ));
+                          bool response =
+                          await customerProvider.sendNote(
+                              id,
+                              customer.guid,
+                              _noteController.text);
+                          Navigator.of(context).pop();
+                          if (response) {
+                            customerProvider.newNote(
+                              customer.guid,
+                              Note(
+                                _noteController.text,
+                                DateTime.now().toIso8601String(),
+                              ),
+                            );
+                            setState(() {
+                              _noteController.text = "";
+                            });
+                          }
+                          FocusScope.of(context)
+                              .requestFocus(FocusNode());
+                        },
+                        color: Colors.blue,
+                        child: Text(
+                          "POST",
+                          style: getButtonTextStyle(context, isOutline: false),
+                        ),
                       ),
                     ),
                   ),
@@ -423,7 +424,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                         blurRadius: 8)
                   ]),
               child: InkWell(
-                onTap: () async {
+                onTap: keyboardProvider.isKeyboardVisible ? null : () async {
                   if (!customer.isCheckedIn) {
                     showModalBottomSheet(
                       context: context,
@@ -451,20 +452,13 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                                 child: AlertDialog(
                                   elevation: 0,
                                   backgroundColor: Colors.transparent,
-                                  content: Container(
-                                    width: 144,
-                                    height: 144,
-                                    child: Image.asset(
-                                      "images/loading.gif",
-                                      fit: BoxFit.contain,
-                                      filterQuality: FilterQuality.high,
-                                    ),
+                                  content: Center(
+                                    child: CircularProgressIndicator(),
                                   ),
                                 ),
                               ),
                             ));
-                    bool result = await customerProvider.checkOut(
-                        user.token, user.guid, customer.guid);
+                    bool result = await customerProvider.checkOut(customer.guid);
                     if (result) {
                       customerProvider.newCheckOut(customer.guid);
                       historyProvider.newCheckOut(customer);

@@ -9,6 +9,10 @@ var base64 = const Base64Codec();
 
 final String ultimateDateFormat = "yyyy-MM-dd'T'HH:mm:ss";
 
+//####################################HIVE######################################
+const  int tableUSER = 0;
+//##############################################################################
+
 //####################################THEME#####################################
 final Color backgroundColor = Colors.white;
 final Color accentColor = Colors.blue;

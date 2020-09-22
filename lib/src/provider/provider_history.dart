@@ -2,8 +2,10 @@ import 'dart:collection';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:geesereleif/src/model/customer.dart';
+import 'package:geesereleif/src/model/user.dart';
 import 'package:geesereleif/src/provider/provider_customer.dart';
 import 'package:geesereleif/src/util/helper.dart';
+import 'package:hive/hive.dart';
 import 'package:http/http.dart';
 import 'package:geesereleif/src/model/history.dart';
 import 'package:geesereleif/src/util/constraints.dart';
@@ -12,6 +14,13 @@ import 'package:geesereleif/src/util/network_helper.dart';
 class HistoryProvider extends ChangeNotifier {
   Map<String, History> items = HashMap<String, History>();
   bool isLoading = true;
+  User user;
+  Box<User> userBox;
+
+  init() {
+    userBox = Hive.box("users");
+    user = userBox.getAt(0);
+  }
 
   List<History> get getAllHistories {
     List<History> _list = [];
@@ -35,12 +44,11 @@ class HistoryProvider extends ChangeNotifier {
   History findHistoryByID(String time) =>
       items.containsKey(time) ? items[time] : null;
 
-  Future<void> getHistory(
-      String token, String userId, CustomerProvider customerProvider) async {
+  Future<void> getHistory(CustomerProvider customerProvider) async {
     try {
       Map<String, String> headers = {
-        "Authorization": token,
-        "UserId": userId,
+        "Authorization": user.token,
+        "UserId": user.guid,
       };
 
       Response response =
@@ -97,15 +105,14 @@ class HistoryProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> refreshHistory(
-      String token, String userId, CustomerProvider customerProvider) async {
+  Future<void> refreshHistory(CustomerProvider customerProvider) async {
     isLoading = true;
     items = {};
     notifyListeners();
     try {
       Map<String, String> headers = {
-        "Authorization": token,
-        "UserId": userId,
+        "Authorization": user.token,
+        "UserId": user.guid,
       };
 
       Response response =
@@ -163,12 +170,31 @@ class HistoryProvider extends ChangeNotifier {
   }
 
   void newCheckIn(Customer customer) {
-    items[DateTime.now().toIso8601String()] = History(customer: customer, dateTime: DateTime.now().toIso8601String(), logType: LogType.CheckedIn);
+    items[DateTime.now().toIso8601String()] = History(
+        customer: customer,
+        dateTime: DateTime.now().toIso8601String(),
+        logType: LogType.CheckedIn);
     notifyListeners();
   }
 
   void newCheckOut(Customer customer) {
-    items[DateTime.now().toIso8601String()] = History(customer: customer, dateTime: DateTime.now().toIso8601String(), logType: LogType.CheckedOut);
+    items[DateTime.now().toIso8601String()] = History(
+        customer: customer,
+        dateTime: DateTime.now().toIso8601String(),
+        logType: LogType.CheckedOut);
     notifyListeners();
+  }
+
+  void clear() {
+    if (items.length > 0) {
+      items = {};
+      isLoading = true;
+      notifyListeners();
+    }
+  }
+
+  logout() {
+    user.isAuthenticated = false;
+    userBox.putAt(0, user);
   }
 }

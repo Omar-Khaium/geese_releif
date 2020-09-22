@@ -17,4 +17,6 @@ class KeyboardProvider extends ChangeNotifier {
     if(isKeyboardVisible)
       FocusScope.of(context).requestFocus(FocusNode());
   }
+
+  bool get isKeyboardHidden => !isKeyboardVisible;
 }

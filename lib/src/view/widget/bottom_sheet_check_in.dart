@@ -38,20 +38,13 @@ class CheckIn extends StatelessWidget {
                               child: AlertDialog(
                                 elevation: 0,
                                 backgroundColor: Colors.transparent,
-                                content: Container(
-                                  width: 144,
-                                  height: 144,
-                                  child: Image.asset(
-                                    "images/loading.gif",
-                                    fit: BoxFit.contain,
-                                    filterQuality: FilterQuality.high,
-                                  ),
+                                content: Center(
+                                  child: CircularProgressIndicator(),
                                 ),
                               ),
                             ),
                           ));
-                  bool result = await customerProvider.checkIn(user.token,
-                      user.guid, customer.guid, countController.text);
+                  bool result = await customerProvider.checkIn(customer.guid, countController.text);
                   Navigator.of(context).pop();
                   if (result) {
                     onSave(int.parse(countController.text));

@@ -2,11 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:geesereleif/src/model/user.dart';
+import 'package:geesereleif/src/provider/provider_customer.dart';
+import 'package:geesereleif/src/provider/provider_history.dart';
 import 'package:geesereleif/src/provider/provider_route.dart';
 import 'package:geesereleif/src/view/screen/screen_routes.dart';
 import 'package:geesereleif/src/util/constraints.dart';
 import 'package:geesereleif/src/util/network_helper.dart';
 import 'package:geesereleif/src/view/widget/widget_loading.dart';
+import 'package:hive/hive.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
@@ -17,19 +20,35 @@ class LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<LoginForm> {
   TextEditingController _usernameController =
-      TextEditingController(text: "administrator");
+      TextEditingController(); //text: "administrator"
   TextEditingController _passwordController =
-      TextEditingController(text: "@AadGjMpTw9!");
+      TextEditingController(); //text: "@AadGjMpTw9!"
   bool _isObscure = true;
   bool _isRemembered = false;
+  User user;
+  Box<User> userBox;
 
   final _formKey = GlobalKey<FormState>();
 
   @override
+  void initState() {
+    userBox = Hive.box("users");
+    user = userBox.length > 0 ? userBox.getAt(0) : User();
+    _usernameController.text = user.isRemembered ?? false ? user.email ?? "" : "";
+    _passwordController.text = user.isRemembered ?? false ? user.password ?? "" : "";
+    _isRemembered = user.isRemembered ?? false;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final routeProvider = Provider.of<RouteProvider>(context, listen: false);
+    final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
+    final historyProvider = Provider.of<HistoryProvider>(context, listen: false);
     Future.delayed(Duration(milliseconds: 0), () {
       routeProvider.clear();
+      customerProvider.clear();
+      historyProvider.clear();
     });
     return Form(
       key: _formKey,
@@ -128,7 +147,11 @@ class _LoginFormState extends State<LoginForm> {
               ),
               onPressed: () {
                 if (_formKey.currentState.validate()) {
-                  showDialog(context: context, builder: (context) => Loading());
+                  user.isRemembered = _isRemembered;
+                  user.email = _usernameController.text;
+                  user.password = _passwordController.text;
+                  FocusScope.of(context).requestFocus(FocusNode());
+                  showDialog(context: context, builder: (context) => Loading(Colors.blue));
                   login();
                 }
               },
@@ -141,14 +164,10 @@ class _LoginFormState extends State<LoginForm> {
 
   login() async {
     try {
-      String username = _usernameController.text;
-      String password = _passwordController.text;
-
       Map<String, String> headers = {};
-
       Map<String, String> body = {
-        "username": username,
-        "password": password,
+        "username": user.email,
+        "password": user.password,
         "grant_type": "password",
       };
 
@@ -157,16 +176,32 @@ class _LoginFormState extends State<LoginForm> {
 
       if (response.statusCode == 200) {
         Map<String, dynamic> result = json.decode(response.body);
-        user.email = username;
-        user.password = password;
+        user.isAuthenticated = true;
         user.token = "${result["token_type"]} ${result["access_token"]} ";
-
+        Navigator.of(context).pop();
+        showDialog(context: context, builder: (context) => Loading(Colors.green));
         getProfileData();
       } else {
+        user.isAuthenticated = false;
+        /*StatusAlert.show(
+          context,
+          duration: Duration(milliseconds: 100),
+          title: 'Authentication Failed',
+          subtitle: 'internal server error',
+          configuration: IconConfiguration(icon: Icons.lock),
+        );*/
         Navigator.of(context).pop();
       }
     } catch (error) {
+      user.isAuthenticated = false;
       print(error);
+      /*StatusAlert.show(
+        context,
+        duration: Duration(milliseconds: 100),
+        title: 'Authentication Failed',
+        subtitle: 'something went wrong',
+        configuration: IconConfiguration(icon: Icons.lock),
+      );*/
       Navigator.of(context).pop();
     }
   }
@@ -185,13 +220,32 @@ class _LoginFormState extends State<LoginForm> {
         Map<String, dynamic> result = json.decode(response.body);
 
         user = User.fromJson(result, user);
-
+        if (userBox.length == 0) {
+          userBox.add(user);
+        } else {
+          userBox.putAt(0, user);
+        }
         Navigator.of(context).pop();
         Navigator.of(context).pushReplacementNamed(RoutesScreen().routeName);
       } else {
+        /*StatusAlert.show(
+          context,
+          duration: Duration(milliseconds: 500),
+          title: 'Profile Fetching Failed',
+          subtitle: "internal server error",
+          configuration: IconConfiguration(icon: Icons.person_outline),
+        );*/
         Navigator.of(context).pop();
       }
     } catch (error) {
+      print(error);
+      /*StatusAlert.show(
+        context,
+        duration: Duration(milliseconds: 500),
+        title: 'Profile Fetching Failed',
+        subtitle: "something went wrong",
+        configuration: IconConfiguration(icon: Icons.person_outline),
+      );*/
       Navigator.of(context).pop();
     }
   }

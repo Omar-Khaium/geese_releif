@@ -9,6 +9,7 @@ import 'package:geesereleif/src/view/screen/screen_history.dart';
 import 'package:geesereleif/src/view/screen/screen_login.dart';
 import 'package:geesereleif/src/util/constraints.dart';
 import 'package:geesereleif/src/view/widget/list_item/item_customer.dart';
+import 'package:geesereleif/src/view/widget/shimmer/shimmer_customer.dart';
 import 'package:provider/provider.dart';
 
 class CustomersScreen extends StatelessWidget {
@@ -18,8 +19,9 @@ class CustomersScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final customerProvider = Provider.of<CustomerProvider>(context);
     final String routeId = ModalRoute.of(context).settings.arguments as String;
+    customerProvider.init();
     if (customerProvider.customerList(routeId).length == 0) {
-      customerProvider.getCustomers(user.token, routeId);
+      customerProvider.getCustomers(routeId);
     }
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -39,7 +41,7 @@ class CustomersScreen extends StatelessWidget {
               Navigator.of(context).pushNamed(HistoryScreen().routeName);
             },
             label: Text(
-              user.name.length > 11 ? "History" : user.name,
+              "History",
               style: getDefaultTextStyle(context),
             ),
             labelPadding: const EdgeInsets.only(right: 4),
@@ -52,8 +54,11 @@ class CustomersScreen extends StatelessWidget {
             elevation: 0,
           ),
           IconButton(
-            onPressed: () => Navigator.of(context)
-                .pushReplacementNamed(LoginScreen().routeName),
+            onPressed: () {
+              customerProvider.logout();
+              Navigator.of(context)
+                  .pushReplacementNamed(LoginScreen().routeName);
+            },
             icon: Icon(
               FontAwesomeIcons.signOutAlt,
               color: Colors.black,
@@ -62,17 +67,7 @@ class CustomersScreen extends StatelessWidget {
         ],
       ),
       body: customerProvider.isLoading
-          ? Center(
-              child: Container(
-                width: 144,
-                height: 144,
-                child: Image.asset(
-                  "images/loading.gif",
-                  fit: BoxFit.cover,
-                  filterQuality: FilterQuality.high,
-                ),
-              ),
-            )
+          ? ShimmerCustomer()
           : customerProvider.customerList(routeId).length == 0
               ? Center(
                   child: Text(
@@ -82,8 +77,7 @@ class CustomersScreen extends StatelessWidget {
                 )
               : RefreshIndicator(
                   onRefresh: () {
-                    return customerProvider.refreshCustomers(
-                        user.token, routeId);
+                    return customerProvider.refreshCustomers(routeId);
                   },
                   child: ListView.separated(
                     shrinkWrap: false,

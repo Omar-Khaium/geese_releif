@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geesereleif/src/model/user.dart';
 import 'package:geesereleif/src/provider/provider_customer.dart';
 import 'package:geesereleif/src/provider/provider_history.dart';
 import 'package:geesereleif/src/provider/provider_keyboard.dart';
@@ -12,9 +13,15 @@ import 'package:geesereleif/src/view/screen/screen_photo_preview.dart';
 import 'package:geesereleif/src/view/screen/screen_routes.dart';
 import 'package:geesereleif/src/view/screen/screen_upload_file.dart';
 import 'package:geesereleif/src/util/constraints.dart';
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final directory = await getApplicationDocumentsDirectory();
+  Hive.init(directory.path);
+  Hive.registerAdapter(UserAdapter());
   runApp(MyApp());
 }
 
@@ -90,6 +97,13 @@ class HomeScreen extends StatelessWidget {
   }
 
   redirect(BuildContext context) async {
-    Navigator.of(context).pushReplacementNamed(LoginScreen().routeName);
+    Box<User> userBox = await Hive.openBox("users");
+    User user =
+        userBox == null ? null : userBox.length > 0 ? userBox.getAt(0) : null;
+    Navigator.of(context).pushReplacementNamed(user == null
+        ? LoginScreen().routeName
+        : user.isAuthenticated ?? false
+            ? RoutesScreen().routeName
+            : LoginScreen().routeName);
   }
 }

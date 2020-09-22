@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:geesereleif/src/model/user.dart';
 import 'package:geesereleif/src/util/constraints.dart';
+import 'package:hive/hive.dart';
 import 'package:http/http.dart';
 import 'package:geesereleif/src/model/route.dart';
 import 'package:geesereleif/src/util/network_helper.dart';
@@ -9,11 +11,18 @@ import 'package:geesereleif/src/util/network_helper.dart';
 class RouteProvider extends ChangeNotifier {
   Map<String, Routes> routes = {};
   bool isLoading = true;
+  User user;
+  Box<User> userBox;
 
-  Future<void> getRoutes(String token) async {
+  init() {
+    userBox = Hive.box("users");
+    user = userBox.getAt(0);
+  }
+
+  Future<void> getRoutes() async {
     try {
       Map<String, String> headers = {
-        "Authorization": token,
+        "Authorization": user.token,
         "PageNo": "1",
         "PageSize": "10",
       };
@@ -40,12 +49,12 @@ class RouteProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> refreshRoutes(String token) async {
+  Future<void> refreshRoutes() async {
     isLoading = true;
     notifyListeners();
     try {
       Map<String, String> headers = {
-        "Authorization": token,
+        "Authorization": user.token,
         "PageNo": "1",
         "PageSize": "10",
       };
@@ -73,12 +82,17 @@ class RouteProvider extends ChangeNotifier {
   }
 
   List<Routes> get routeList {
-    return routes.values.toList();
+    return routes == null ? 0 : routes.values.toList();
   }
 
   clear() {
     routes = {};
     isLoading = true;
     notifyListeners();
+  }
+
+  logout() {
+    user.isAuthenticated = false;
+    userBox.putAt(0, user);
   }
 }

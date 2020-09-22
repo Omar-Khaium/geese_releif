@@ -7,7 +7,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatelessWidget {
   final String routeName = "/login";
-
   @override
   Widget build(BuildContext context) {
     final keyboardProvider = Provider.of<KeyboardProvider>(context);
@@ -21,10 +20,13 @@ class LoginScreen extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Image.asset(
-                    "images/logo.png",
-                    width: 144,
-                    fit: BoxFit.contain,
+                  Visibility(
+                    visible: !keyboardProvider.isKeyboardVisible,
+                    child: Image.asset(
+                      "images/logo.png",
+                      width: 144,
+                      fit: BoxFit.contain,
+                    ),
                   ),
                   Container(
                     width: 320,

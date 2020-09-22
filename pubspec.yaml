@@ -14,9 +14,10 @@ dependencies:
   path_provider:
   provider:
   font_awesome_flutter:
+  hive:
+  hive_flutter:
   shimmer:
   intl:
-  flushbar: 1.10.0
   url_launcher:
   keyboard_visibility:
   maps_launcher:
@@ -27,9 +28,12 @@ dependencies:
   image_cropper:
   cached_network_image:
 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  hive_generator:
+  build_runner:
 
 flutter:
   uses-material-design: true

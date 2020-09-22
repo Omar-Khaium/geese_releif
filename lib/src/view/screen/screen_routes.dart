@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -8,6 +6,7 @@ import 'package:geesereleif/src/view/screen/screen_customers.dart';
 import 'package:geesereleif/src/view/screen/screen_history.dart';
 import 'package:geesereleif/src/view/screen/screen_login.dart';
 import 'package:geesereleif/src/util/constraints.dart';
+import 'package:geesereleif/src/view/widget/shimmer/shimmer_route.dart';
 import 'package:provider/provider.dart';
 
 class RoutesScreen extends StatelessWidget {
@@ -16,7 +15,11 @@ class RoutesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final routeProvider = Provider.of<RouteProvider>(context);
-    if (routeProvider.routes.length == 0) routeProvider.getRoutes(user.token);
+    if (routeProvider.routeList.length == 0) {
+      routeProvider.init();
+      routeProvider.getRoutes();
+    }
+
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
@@ -35,7 +38,7 @@ class RoutesScreen extends StatelessWidget {
               Navigator.of(context).pushNamed(HistoryScreen().routeName);
             },
             label: Text(
-              user.name.length > 11 ? "History" : user.name,
+              "History",
               style: getDefaultTextStyle(context),
             ),
             labelPadding: const EdgeInsets.only(right: 4),
@@ -48,8 +51,10 @@ class RoutesScreen extends StatelessWidget {
             elevation: 0,
           ),
           IconButton(
-            onPressed: () => Navigator.of(context)
-                .pushReplacementNamed(LoginScreen().routeName),
+            onPressed: () {
+              routeProvider.logout();
+              Navigator.of(context).pushReplacementNamed(LoginScreen().routeName);
+            },
             icon: Icon(
               FontAwesomeIcons.signOutAlt,
               color: Colors.black,
@@ -58,17 +63,7 @@ class RoutesScreen extends StatelessWidget {
         ],
       ),
       body: routeProvider.isLoading
-          ? Center(
-              child: Container(
-                width: 144,
-                height: 144,
-                child: Image.asset(
-                  "images/loading.gif",
-                  fit: BoxFit.cover,
-                  filterQuality: FilterQuality.high,
-                ),
-              ),
-            )
+          ? ShimmerRoute()
           : routeProvider.routeList.length == 0
               ? Center(
                   child: Text(
@@ -78,7 +73,7 @@ class RoutesScreen extends StatelessWidget {
                 )
               : RefreshIndicator(
                   onRefresh: () {
-                    return routeProvider.refreshRoutes(user.token);
+                    return routeProvider.refreshRoutes();
                   },
                   child: ListView.separated(
                     shrinkWrap: false,
@@ -91,9 +86,7 @@ class RoutesScreen extends StatelessWidget {
                     itemBuilder: (context, index) => ListTile(
                       dense: true,
                       onTap: () {
-                        Navigator.of(context).pushNamed(
-                            CustomersScreen().routeName,
-                            arguments: routeProvider.routeList[index].guid);
+                        Navigator.of(context).pushNamed(CustomersScreen().routeName, arguments: routeProvider.routeList[index].guid);
                       },
                       trailing: Icon(
                         Icons.keyboard_arrow_right,

@@ -1,40 +1,46 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:geesereleif/src/model/note.dart';
 import 'package:geesereleif/src/model/customer.dart';
 import 'package:geesereleif/src/model/media_file.dart';
+import 'package:geesereleif/src/model/user.dart';
 import 'package:geesereleif/src/util/constraints.dart';
 import 'package:geesereleif/src/util/network_helper.dart';
+import 'package:geesereleif/src/view/widget/widget_loading.dart';
+import 'package:hive/hive.dart';
 import 'package:http/http.dart';
 
 class CustomerProvider extends ChangeNotifier {
   Map<String, Customer> customers = {};
   bool isLoading = true;
+  User user;
+  Box<User> userBox;
 
-  Future<void> getCustomers(String token, String routeId) async {
+  init() {
+    userBox = Hive.box("users");
+    user = userBox.getAt(0);
+  }
+
+  Future<void> getCustomers(String routeId) async {
     try {
       Map<String, String> headers = {
-        "Authorization": token,
+        "Authorization": user.token,
         "PageNo": "1",
         "PageSize": "10",
         "RouteId": routeId,
       };
 
-      Response response =
-          await NetworkHelper.apiGET(api: apiCustomers, headers: headers);
+      Response response = await NetworkHelper.apiGET(api: apiCustomers, headers: headers);
 
       if (response.statusCode == 200) {
-        List<Map<String, dynamic>> result = List<Map<String, dynamic>>.from(
-            json.decode(response.body)['CustomerDetail']);
+        List<Map<String, dynamic>> result = List<Map<String, dynamic>>.from(json.decode(response.body)['CustomerDetail']);
         for (Map<String, dynamic> map in result) {
           Customer customer = Customer.fromJson(
-              map["Customers"],
-              List<Map<String, dynamic>>.from(map["Media"]),
-              List<Map<String, dynamic>>.from(map["Note"]),
-              routeId);
-          if (!customers.containsKey(customer.guid))
-            customers[customer.guid] = customer;
+              map["Customers"], List<Map<String, dynamic>>.from(map["Media"]), List<Map<String, dynamic>>.from(map["Note"]), routeId);
+          if (!customers.containsKey(customer.guid)) customers[customer.guid] = customer;
         }
         isLoading = false;
         notifyListeners();
@@ -48,31 +54,25 @@ class CustomerProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> refreshCustomers(String token, String routeId) async {
+  Future<void> refreshCustomers(String routeId) async {
     isLoading = true;
     notifyListeners();
     try {
       Map<String, String> headers = {
-        "Authorization": token,
+        "Authorization": user.token,
         "PageNo": "1",
         "PageSize": "10",
         "RouteId": routeId,
       };
 
-      Response response =
-          await NetworkHelper.apiGET(api: apiCustomers, headers: headers);
+      Response response = await NetworkHelper.apiGET(api: apiCustomers, headers: headers);
 
       if (response.statusCode == 200) {
-        List<Map<String, dynamic>> result = List<Map<String, dynamic>>.from(
-            json.decode(response.body)['CustomerDetail']);
+        List<Map<String, dynamic>> result = List<Map<String, dynamic>>.from(json.decode(response.body)['CustomerDetail']);
         for (Map<String, dynamic> map in result) {
           Customer customer = Customer.fromJson(
-              map["Customers"],
-              List<Map<String, dynamic>>.from(map["Media"]),
-              List<Map<String, dynamic>>.from(map["Note"]),
-              routeId);
-          if (!customers.containsKey(customer.guid))
-            customers[customer.guid] = customer;
+              map["Customers"], List<Map<String, dynamic>>.from(map["Media"]), List<Map<String, dynamic>>.from(map["Note"]), routeId);
+          if (!customers.containsKey(customer.guid)) customers[customer.guid] = customer;
         }
         isLoading = false;
         notifyListeners();
@@ -86,22 +86,20 @@ class CustomerProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> sendNote(String token, String routeId, String userId,
-      String customerId, String note) async {
+  Future<bool> sendNote(String routeId, String customerId, String note) async {
     isLoading = true;
     notifyListeners();
     try {
       Map<String, String> headers = {
-        "Authorization": token,
+        "Authorization": user.token,
         "CustomerId": customerId,
-        "UserId": userId,
+        "UserId": user.guid,
         "Note": note,
       };
 
       Map<String, String> body = {};
 
-      Response response = await NetworkHelper.apiPOST(
-          api: apiSendNote, headers: headers, body: body);
+      Response response = await NetworkHelper.apiPOST(api: apiSendNote, headers: headers, body: body);
 
       if (response.statusCode == 200) {
         bool result = json.decode(response.body)['result'];
@@ -120,20 +118,18 @@ class CustomerProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> checkIn(
-      String token, String userId, String customerId, String geeseCount) async {
+  Future<bool> checkIn(String customerId, String geeseCount) async {
     try {
       Map<String, String> headers = {
-        "Authorization": token,
+        "Authorization": user.token,
         "CustomerId": customerId,
-        "UserId": userId,
+        "UserId": user.guid,
         "GeeseCount": geeseCount,
       };
 
       Map<String, String> body = {};
 
-      Response response = await NetworkHelper.apiPOST(
-          api: apiCheckIn, headers: headers, body: body);
+      Response response = await NetworkHelper.apiPOST(api: apiCheckIn, headers: headers, body: body);
 
       if (response.statusCode == 200) {
         return json.decode(response.body)['result'] as bool;
@@ -145,18 +141,17 @@ class CustomerProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> checkOut(String token, String userId, String customerId) async {
+  Future<bool> checkOut(String customerId) async {
     try {
       Map<String, String> headers = {
-        "Authorization": token,
+        "Authorization": user.token,
         "CustomerId": customerId,
-        "UserId": userId,
+        "UserId": user.guid,
       };
 
       Map<String, String> body = {};
 
-      Response response = await NetworkHelper.apiPOST(
-          api: apiCheckOut, headers: headers, body: body);
+      Response response = await NetworkHelper.apiPOST(api: apiCheckOut, headers: headers, body: body);
 
       if (response.statusCode == 200) {
         return json.decode(response.body)['result'] as bool;
@@ -168,10 +163,68 @@ class CustomerProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> saveImage(
+      BuildContext context,
+      String path,
+      String customerId,
+      CustomerProvider customerProvider,
+      ) async {
+    try {
+      Map<String, String> headers = {
+        "Authorization": user.token,
+        "CustomerId": customerId,
+        "Path": path,
+      };
+
+      Response response =
+      await NetworkHelper.apiPOST(api: apiSaveMedia, headers: headers);
+
+      if (response.statusCode == 200) {
+        customerProvider.newMedia(customerId, apiBaseUrl+path);
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+      } else {
+        Navigator.of(context).pop();
+      }
+    } catch (error) {
+      Navigator.of(context).pop();
+    }
+  }
+
+  Future<void> uploadImage(
+      BuildContext context,
+      File image,
+      String customerId,
+      CustomerProvider customerProvider,
+      ) async {
+    try {
+      Map<String, String> headers = {
+        "Authorization": user.token,
+        "Content-Type": "application/x-www-form-urlencoded",
+      };
+      Map<String, String> body = {
+        "filename": "${DateTime.now().millisecondsSinceEpoch}.png",
+        "filepath": base64.encode(image.readAsBytesSync()),
+      };
+
+      Response response = await NetworkHelper.apiPOST(
+          api: apiUpload, headers: headers, body: body);
+
+      if (response.statusCode == 200) {
+        var result = json.decode(response.body);
+        Navigator.of(context).pop();
+        showDialog(context: context, builder: (context) => Loading(Colors.green));
+        saveImage(context, result["filePath"], customerId, customerProvider);
+      } else {
+        Navigator.of(context).pop();
+      }
+    } catch (error) {
+      Navigator.of(context).pop();
+    }
+  }
+
   List<Customer> customerList(String routeId) {
-    return customers.values
-        .where((element) => element.routeId == routeId)
-        .toList();
+    return customers.values.where((element) => element.routeId == routeId).toList();
   }
 
   clear() {
@@ -189,7 +242,8 @@ class CustomerProvider extends ChangeNotifier {
   void newMedia(String customerId, String path) {
     Customer customer = findCustomerByID(customerId);
     customer.mediaList.add(
-          MediaFile(path, DateTime.now().toIso8601String()),);
+      MediaFile(path, DateTime.now().toIso8601String()),
+    );
     notifyListeners();
   }
 
@@ -199,7 +253,7 @@ class CustomerProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void newCheckIn(String customerId, int geeseCount ) {
+  void newCheckIn(String customerId, int geeseCount) {
     Customer customer = findCustomerByID(customerId);
     customer.isCheckedIn = true;
     customer.geeseCount = geeseCount;
@@ -210,5 +264,10 @@ class CustomerProvider extends ChangeNotifier {
     Customer customer = findCustomerByID(customerId);
     customer.isCheckedIn = false;
     notifyListeners();
+  }
+
+  logout() {
+    user.isAuthenticated = false;
+    userBox.putAt(0, user);
   }
 }
