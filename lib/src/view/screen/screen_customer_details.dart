@@ -46,55 +46,59 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
     final Customer customer = customerProvider.findCustomerByID(id);
     return Scaffold(
       backgroundColor: backgroundColor,
-      floatingActionButton: Container(
-        margin: EdgeInsets.only(bottom: 48),
-        child: FloatingActionButton(
-          elevation: 4,
-          onPressed: () {
-            showCupertinoModalPopup(
-              context: context,
-              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
-              builder: (context) => CupertinoActionSheet(
-                actions: <Widget>[
-                  CupertinoActionSheetAction(
-                    child: Text(
-                      "Camera",
-                      style: getClickableTextStyle(context, forMenu: true),
+      floatingActionButton: Visibility(
+        visible: keyboardProvider.isKeyboardHidden,
+        child: Container(
+          margin: EdgeInsets.only(bottom: 48),
+          child: FloatingActionButton(
+            elevation: 4,
+            onPressed: () {
+              keyboardProvider.hideKeyboard(context);
+              showCupertinoModalPopup(
+                context: context,
+                filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                builder: (context) => CupertinoActionSheet(
+                  actions: <Widget>[
+                    CupertinoActionSheetAction(
+                      child: Text(
+                        "Camera",
+                        style: getClickableTextStyle(context, forMenu: true),
+                      ),
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+                        getImage(ImageSource.camera, customer.guid);
+                      },
                     ),
-                    onPressed: () async {
-                      Navigator.of(context).pop();
-                      getImage(ImageSource.camera, customer.guid);
+                    CupertinoActionSheetAction(
+                      child: Text("Gallery",
+                          style: getClickableTextStyle(context, forMenu: true)),
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+                        getImage(ImageSource.gallery, customer.guid);
+                      },
+                    ),
+                  ],
+                  cancelButton: CupertinoActionSheetAction(
+                    child: Text(
+                      "Close",
+                      style: getDeleteTextStyle(context),
+                    ),
+                    isDestructiveAction: true,
+                    onPressed: () {
+                      Navigator.pop(context);
                     },
                   ),
-                  CupertinoActionSheetAction(
-                    child: Text("Gallery",
-                        style: getClickableTextStyle(context, forMenu: true)),
-                    onPressed: () async {
-                      Navigator.of(context).pop();
-                      getImage(ImageSource.gallery, customer.guid);
-                    },
-                  ),
-                ],
-                cancelButton: CupertinoActionSheetAction(
-                  child: Text(
-                    "Close",
-                    style: getDeleteTextStyle(context),
-                  ),
-                  isDestructiveAction: true,
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
                 ),
-              ),
-            );
-          },
-          backgroundColor: accentColor,
-          child: Icon(
-            FontAwesomeIcons.plus,
-            size: 24,
-            color: Colors.white,
+              );
+            },
+            backgroundColor: accentColor,
+            child: Icon(
+              FontAwesomeIcons.plus,
+              size: 24,
+              color: Colors.white,
+            ),
+            mini: false,
           ),
-          mini: false,
         ),
       ),
       appBar: AppBar(
@@ -108,6 +112,17 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
           style: getAppBarTextStyle(context),
           overflow: TextOverflow.ellipsis,
         ),
+        actions: [
+          Visibility(
+            visible: keyboardProvider.isKeyboardVisible,
+            child: IconButton(
+              onPressed: (){
+                keyboardProvider.hideKeyboard(context);
+              },
+              icon: Icon(Icons.keyboard_hide, color: accentColor,),
+            ),
+          )
+        ],
       ),
       body: Stack(
         children: [
@@ -115,7 +130,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
             top: 0,
             left: 0,
             right: 0,
-            bottom: 54,
+            bottom: keyboardProvider.isKeyboardVisible ? 0 : 54,
             child: Container(
               height: MediaQuery.of(context).size.height,
               child: ListView(
@@ -412,66 +427,69 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
             bottom: 0,
             left: 0,
             right: 0,
-            child: Container(
-              height: 54,
-              decoration: BoxDecoration(
-                  color: customer.isCheckedIn ? Colors.red : accentColor,
-                  boxShadow: [
-                    BoxShadow(
-                        offset: Offset(0, 1),
-                        color: Colors.grey.shade100,
-                        spreadRadius: 8,
-                        blurRadius: 8)
-                  ]),
-              child: InkWell(
-                onTap: keyboardProvider.isKeyboardVisible ? null : () async {
-                  if (!customer.isCheckedIn) {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      builder: (context) => Padding(
-                        padding: MediaQuery.of(context).viewInsets,
-                        child: CheckIn(
-                          customer,
-                          customerProvider,
-                          onSave: (count) {
-                            customerProvider.newCheckIn(customer.guid, count);
-                            historyProvider.newCheckIn(customer);
-                          },
-                        ),
-                      ),
-                    );
-                  } else {
-                    showDialog(
+            child: Visibility(
+              visible: keyboardProvider.isKeyboardHidden,
+              child: Container(
+                height: 54,
+                decoration: BoxDecoration(
+                    color: customer.isCheckedIn ? Colors.red : accentColor,
+                    boxShadow: [
+                      BoxShadow(
+                          offset: Offset(0, 1),
+                          color: Colors.grey.shade100,
+                          spreadRadius: 8,
+                          blurRadius: 8)
+                    ]),
+                child: InkWell(
+                  onTap: keyboardProvider.isKeyboardVisible ? null : () async {
+                    if (!customer.isCheckedIn) {
+                      showModalBottomSheet(
                         context: context,
-                        barrierDismissible: false,
-                        builder: (context) => WillPopScope(
-                              onWillPop: () async => false,
-                              child: BackdropFilter(
-                                filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
-                                child: AlertDialog(
-                                  elevation: 0,
-                                  backgroundColor: Colors.transparent,
-                                  content: Center(
-                                    child: CircularProgressIndicator(),
+                        isScrollControlled: true,
+                        builder: (context) => Padding(
+                          padding: MediaQuery.of(context).viewInsets,
+                          child: CheckIn(
+                            customer,
+                            customerProvider,
+                            onSave: (count) {
+                              customerProvider.newCheckIn(customer.guid, count);
+                              historyProvider.newCheckIn(customer);
+                            },
+                          ),
+                        ),
+                      );
+                    } else {
+                      showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) => WillPopScope(
+                                onWillPop: () async => false,
+                                child: BackdropFilter(
+                                  filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                                  child: AlertDialog(
+                                    elevation: 0,
+                                    backgroundColor: Colors.transparent,
+                                    content: Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ));
-                    bool result = await customerProvider.checkOut(customer.guid);
-                    if (result) {
-                      customerProvider.newCheckOut(customer.guid);
-                      historyProvider.newCheckOut(customer);
+                              ));
+                      bool result = await customerProvider.checkOut(customer.guid);
+                      if (result) {
+                        customerProvider.newCheckOut(customer.guid);
+                        historyProvider.newCheckOut(customer);
+                      }
+                      Navigator.of(context).pop();
                     }
-                    Navigator.of(context).pop();
-                  }
-                },
-                splashColor: Colors.black,
-                highlightColor: Colors.white,
-                child: Center(
-                  child: Text(
-                    "Check ${customer.isCheckedIn ? "out" : "in"}",
-                    style: getButtonTextStyle(context, isOutline: false),
+                  },
+                  splashColor: Colors.black,
+                  highlightColor: Colors.white,
+                  child: Center(
+                    child: Text(
+                      "Check ${customer.isCheckedIn ? "out" : "in"}",
+                      style: getButtonTextStyle(context, isOutline: false),
+                    ),
                   ),
                 ),
               ),

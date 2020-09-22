@@ -5,7 +5,7 @@ class ShimmerRoute extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
-      itemBuilder: (context, index) => ShimmerRouteItem(),
+      itemBuilder: (context, index) => ShimmerRouteItem(index%2==1),
       itemCount: 10,
       separatorBuilder: (context, index) => Divider(
         color: Colors.grey.shade100,
