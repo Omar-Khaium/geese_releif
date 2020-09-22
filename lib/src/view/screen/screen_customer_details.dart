@@ -37,12 +37,9 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final String id = ModalRoute.of(context).settings.arguments as String;
-    final customerProvider =
-        Provider.of<CustomerProvider>(context, listen: true);
-    final historyProvider =
-        Provider.of<HistoryProvider>(context, listen: false);
-    final keyboardProvider =
-        Provider.of<KeyboardProvider>(context, listen: true);
+    final customerProvider = Provider.of<CustomerProvider>(context, listen: true);
+    final historyProvider = Provider.of<HistoryProvider>(context, listen: false);
+    final keyboardProvider = Provider.of<KeyboardProvider>(context, listen: true);
     final Customer customer = customerProvider.findCustomerByID(id);
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -54,42 +51,103 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
             elevation: 4,
             onPressed: () {
               keyboardProvider.hideKeyboard(context);
-              showCupertinoModalPopup(
-                context: context,
-                filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
-                builder: (context) => CupertinoActionSheet(
-                  actions: <Widget>[
-                    CupertinoActionSheetAction(
-                      child: Text(
-                        "Camera",
-                        style: getClickableTextStyle(context, forMenu: true),
+              if (_noteController.text.isNotEmpty) {
+                showCupertinoModalPopup(
+                    context: context,
+                    builder: (context) => CupertinoAlertDialog(
+                          title: Text("Discard note?", style: getAppBarTextStyle(context),),
+                          content: Text("You haven't shared your note yet. Are you sure that you want to leave without posting?"),
+                          actions: [
+                            CupertinoActionSheetAction(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text("Close",style: getActionPositive(context),),
+                              isDefaultAction: true,
+                            ),
+                            CupertinoActionSheetAction(
+                                onPressed: () {
+                                  setState(() {
+                                    _noteController.text="";
+                                  });
+                                  Navigator.of(context).pop();
+                                  showCupertinoModalPopup(
+                                    context: context,
+                                    filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                                    builder: (context) => CupertinoActionSheet(
+                                      actions: <Widget>[
+                                        CupertinoActionSheetAction(
+                                          child: Text(
+                                            "Camera",
+                                            style: getClickableTextStyle(context, forMenu: true),
+                                          ),
+                                          onPressed: () async {
+                                            Navigator.of(context).pop();
+                                            getImage(ImageSource.camera, customer.guid);
+                                          },
+                                        ),
+                                        CupertinoActionSheetAction(
+                                          child: Text("Gallery", style: getClickableTextStyle(context, forMenu: true)),
+                                          onPressed: () async {
+                                            Navigator.of(context).pop();
+                                            getImage(ImageSource.gallery, customer.guid);
+                                          },
+                                        ),
+                                      ],
+                                      cancelButton: CupertinoActionSheetAction(
+                                        child: Text(
+                                          "Close",
+                                          style: getDeleteTextStyle(context),
+                                        ),
+                                        isDestructiveAction: true,
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Text("Discard",style: getActionNegative(context),), isDestructiveAction: true,),
+                          ],
+                        ),
+                    filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4));
+              } else {
+                showCupertinoModalPopup(
+                  context: context,
+                  filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                  builder: (context) => CupertinoActionSheet(
+                    actions: <Widget>[
+                      CupertinoActionSheetAction(
+                        child: Text(
+                          "Camera",
+                          style: getClickableTextStyle(context, forMenu: true),
+                        ),
+                        onPressed: () async {
+                          Navigator.of(context).pop();
+                          getImage(ImageSource.camera, customer.guid);
+                        },
                       ),
-                      onPressed: () async {
-                        Navigator.of(context).pop();
-                        getImage(ImageSource.camera, customer.guid);
+                      CupertinoActionSheetAction(
+                        child: Text("Gallery", style: getClickableTextStyle(context, forMenu: true)),
+                        onPressed: () async {
+                          Navigator.of(context).pop();
+                          getImage(ImageSource.gallery, customer.guid);
+                        },
+                      ),
+                    ],
+                    cancelButton: CupertinoActionSheetAction(
+                      child: Text(
+                        "Close",
+                        style: getDeleteTextStyle(context),
+                      ),
+                      isDestructiveAction: true,
+                      onPressed: () {
+                        Navigator.pop(context);
                       },
                     ),
-                    CupertinoActionSheetAction(
-                      child: Text("Gallery",
-                          style: getClickableTextStyle(context, forMenu: true)),
-                      onPressed: () async {
-                        Navigator.of(context).pop();
-                        getImage(ImageSource.gallery, customer.guid);
-                      },
-                    ),
-                  ],
-                  cancelButton: CupertinoActionSheetAction(
-                    child: Text(
-                      "Close",
-                      style: getDeleteTextStyle(context),
-                    ),
-                    isDestructiveAction: true,
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
                   ),
-                ),
-              );
+                );
+              }
             },
             backgroundColor: accentColor,
             child: Icon(
@@ -116,10 +174,13 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
           Visibility(
             visible: keyboardProvider.isKeyboardVisible,
             child: IconButton(
-              onPressed: (){
+              onPressed: () {
                 keyboardProvider.hideKeyboard(context);
               },
-              icon: Icon(Icons.keyboard_hide, color: accentColor,),
+              icon: Icon(
+                Icons.keyboard_hide,
+                color: accentColor,
+              ),
             ),
           )
         ],
@@ -145,17 +206,14 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                       size: 18,
                     ),
                     title: Text(
-                      customer.lead.isNotEmpty
-                          ? customer.lead
-                          : "lead type unavailable",
+                      customer.lead.isNotEmpty ? customer.lead : "lead type unavailable",
                       style: getDefaultTextStyle(context),
                     ),
                     dense: true,
                   ),
                   ListTile(
                     onTap: () {
-                      if (customer.phone.isNotEmpty)
-                        launch("tel:${customer.phone}");
+                      if (customer.phone.isNotEmpty) launch("tel:${customer.phone}");
                     },
                     leading: Icon(
                       FontAwesomeIcons.phoneAlt,
@@ -163,17 +221,14 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                       size: 18,
                     ),
                     title: Text(
-                      customer.phone.isEmpty
-                          ? "phone number unavailable"
-                          : customer.phone ?? "-",
+                      customer.phone.isEmpty ? "phone number unavailable" : customer.phone ?? "-",
                       style: getDefaultTextStyle(context),
                     ),
                     dense: true,
                   ),
                   ListTile(
                     onTap: () {
-                      MapsLauncher.launchQuery(
-                          "${customer.street}\n${customer.city}, ${customer.state.toUpperCase()} ${customer.zip}");
+                      MapsLauncher.launchQuery("${customer.street}\n${customer.city}, ${customer.state.toUpperCase()} ${customer.zip}");
                     },
                     leading: Icon(
                       FontAwesomeIcons.mapMarkerAlt,
@@ -181,9 +236,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                       size: 18,
                     ),
                     title: Text(
-                      customer.street.isEmpty
-                          ? "street not found"
-                          : customer.street,
+                      customer.street.isEmpty ? "street not found" : customer.street,
                       style: getDefaultTextStyle(context),
                     ),
                     subtitle: Text(
@@ -230,10 +283,8 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                       textAlign: TextAlign.justify,
                       textAlignVertical: TextAlignVertical.top,
                       maxLines: 4,
-                      onChanged: (text){
-                        setState(() {
-
-                        });
+                      onChanged: (text) {
+                        setState(() {});
                       },
                       style: getDefaultTextStyle(context),
                       decoration: InputDecoration(
@@ -263,25 +314,19 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                               context: context,
                               barrierDismissible: false,
                               builder: (context) => WillPopScope(
-                                onWillPop: () async => false,
-                                child: BackdropFilter(
-                                  filter: ImageFilter.blur(
-                                      sigmaX: 4, sigmaY: 4),
-                                  child: AlertDialog(
-                                    elevation: 0,
-                                    backgroundColor:
-                                    Colors.transparent,
-                                    content: Center(
-                                      child: CircularProgressIndicator(),
+                                    onWillPop: () async => false,
+                                    child: BackdropFilter(
+                                      filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                                      child: AlertDialog(
+                                        elevation: 0,
+                                        backgroundColor: Colors.transparent,
+                                        content: Center(
+                                          child: CircularProgressIndicator(),
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                              ));
-                          bool response =
-                          await customerProvider.sendNote(
-                              id,
-                              customer.guid,
-                              _noteController.text);
+                                  ));
+                          bool response = await customerProvider.sendNote(id, customer.guid, _noteController.text);
                           Navigator.of(context).pop();
                           if (response) {
                             customerProvider.newNote(
@@ -295,8 +340,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                               _noteController.text = "";
                             });
                           }
-                          FocusScope.of(context)
-                              .requestFocus(FocusNode());
+                          FocusScope.of(context).requestFocus(FocusNode());
                         },
                         color: Colors.blue,
                         child: Text(
@@ -324,8 +368,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                           onTap: () {
                             showModalBottomSheet(
                               context: context,
-                              builder: (context) =>
-                                  PhotoPreview(customer.mediaList),
+                              builder: (context) => PhotoPreview(customer.mediaList),
                             );
                           },
                           child: Container(
@@ -358,8 +401,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                                   ),
                                   Text(
                                     customer.mediaList.length.toString(),
-                                    style: getClickableTextStyle(context,
-                                        forCount: true),
+                                    style: getClickableTextStyle(context, forCount: true),
                                   ),
                                 ],
                               ),
@@ -373,10 +415,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                           splashColor: Colors.transparent,
                           highlightColor: Colors.transparent,
                           onTap: () {
-                            showModalBottomSheet(
-                                context: context,
-                                builder: (context) =>
-                                    NotesPreview(customer.noteList));
+                            showModalBottomSheet(context: context, builder: (context) => NotesPreview(customer.noteList));
                           },
                           child: Container(
                             width: MediaQuery.of(context).size.width * .4,
@@ -408,8 +447,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                                   ),
                                   Text(
                                     customer.noteList.length.toString(),
-                                    style: getClickableTextStyle(context,
-                                        forCount: true),
+                                    style: getClickableTextStyle(context, forCount: true),
                                   ),
                                 ],
                               ),
@@ -433,56 +471,52 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                 height: 54,
                 decoration: BoxDecoration(
                     color: customer.isCheckedIn ? Colors.red : accentColor,
-                    boxShadow: [
-                      BoxShadow(
-                          offset: Offset(0, 1),
-                          color: Colors.grey.shade100,
-                          spreadRadius: 8,
-                          blurRadius: 8)
-                    ]),
+                    boxShadow: [BoxShadow(offset: Offset(0, 1), color: Colors.grey.shade100, spreadRadius: 8, blurRadius: 8)]),
                 child: InkWell(
-                  onTap: keyboardProvider.isKeyboardVisible ? null : () async {
-                    if (!customer.isCheckedIn) {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        builder: (context) => Padding(
-                          padding: MediaQuery.of(context).viewInsets,
-                          child: CheckIn(
-                            customer,
-                            customerProvider,
-                            onSave: (count) {
-                              customerProvider.newCheckIn(customer.guid, count);
-                              historyProvider.newCheckIn(customer);
-                            },
-                          ),
-                        ),
-                      );
-                    } else {
-                      showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (context) => WillPopScope(
-                                onWillPop: () async => false,
-                                child: BackdropFilter(
-                                  filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
-                                  child: AlertDialog(
-                                    elevation: 0,
-                                    backgroundColor: Colors.transparent,
-                                    content: Center(
-                                      child: CircularProgressIndicator(),
-                                    ),
-                                  ),
+                  onTap: keyboardProvider.isKeyboardVisible
+                      ? null
+                      : () async {
+                          if (!customer.isCheckedIn) {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              builder: (context) => Padding(
+                                padding: MediaQuery.of(context).viewInsets,
+                                child: CheckIn(
+                                  customer,
+                                  customerProvider,
+                                  onSave: (count) {
+                                    customerProvider.newCheckIn(customer.guid, count);
+                                    historyProvider.newCheckIn(customer);
+                                  },
                                 ),
-                              ));
-                      bool result = await customerProvider.checkOut(customer.guid);
-                      if (result) {
-                        customerProvider.newCheckOut(customer.guid);
-                        historyProvider.newCheckOut(customer);
-                      }
-                      Navigator.of(context).pop();
-                    }
-                  },
+                              ),
+                            );
+                          } else {
+                            showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (context) => WillPopScope(
+                                      onWillPop: () async => false,
+                                      child: BackdropFilter(
+                                        filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                                        child: AlertDialog(
+                                          elevation: 0,
+                                          backgroundColor: Colors.transparent,
+                                          content: Center(
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                        ),
+                                      ),
+                                    ));
+                            bool result = await customerProvider.checkOut(customer.guid);
+                            if (result) {
+                              customerProvider.newCheckOut(customer.guid);
+                              historyProvider.newCheckOut(customer);
+                            }
+                            Navigator.of(context).pop();
+                          }
+                        },
                   splashColor: Colors.black,
                   highlightColor: Colors.white,
                   child: Center(

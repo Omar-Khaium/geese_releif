@@ -147,3 +147,21 @@ TextStyle getChatDateStyle(BuildContext context) {
         .copyWith(color: Colors.white, fontWeight: FontWeight.w200),
   );
 }
+
+TextStyle getActionPositive(BuildContext context) {
+  return GoogleFonts.montserrat(
+    textStyle: Theme.of(context)
+        .textTheme
+        .subtitle1
+        .copyWith(color: Colors.blue),
+  );
+}
+
+TextStyle getActionNegative(BuildContext context) {
+  return GoogleFonts.montserrat(
+    textStyle: Theme.of(context)
+        .textTheme
+        .subtitle1
+        .copyWith(color: Colors.red),
+  );
+}
