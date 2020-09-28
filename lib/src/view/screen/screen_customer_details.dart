@@ -55,59 +55,70 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                 showCupertinoModalPopup(
                     context: context,
                     builder: (context) => CupertinoAlertDialog(
-                          title: Text("Discard note?", style: getAppBarTextStyle(context),),
+                          title: Text(
+                            "Discard note?",
+                            style: getAppBarTextStyle(context),
+                          ),
                           content: Text("You haven't shared your note yet. Are you sure that you want to leave without posting?"),
                           actions: [
                             CupertinoActionSheetAction(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: Text("Close",style: getActionPositive(context),),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text(
+                                "Close",
+                                style: getActionPositive(context),
+                              ),
                               isDefaultAction: true,
                             ),
                             CupertinoActionSheetAction(
-                                onPressed: () {
-                                  setState(() {
-                                    _noteController.text="";
-                                  });
-                                  Navigator.of(context).pop();
-                                  showCupertinoModalPopup(
-                                    context: context,
-                                    filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
-                                    builder: (context) => CupertinoActionSheet(
-                                      actions: <Widget>[
-                                        CupertinoActionSheetAction(
-                                          child: Text(
-                                            "Camera",
-                                            style: getClickableTextStyle(context, forMenu: true),
-                                          ),
-                                          onPressed: () async {
-                                            Navigator.of(context).pop();
-                                            getImage(ImageSource.camera, customer.guid);
-                                          },
-                                        ),
-                                        CupertinoActionSheetAction(
-                                          child: Text("Gallery", style: getClickableTextStyle(context, forMenu: true)),
-                                          onPressed: () async {
-                                            Navigator.of(context).pop();
-                                            getImage(ImageSource.gallery, customer.guid);
-                                          },
-                                        ),
-                                      ],
-                                      cancelButton: CupertinoActionSheetAction(
+                              onPressed: () {
+                                setState(() {
+                                  _noteController.text = "";
+                                });
+                                Navigator.of(context).pop();
+                                showCupertinoModalPopup(
+                                  context: context,
+                                  filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                                  builder: (context) => CupertinoActionSheet(
+                                    actions: <Widget>[
+                                      CupertinoActionSheetAction(
                                         child: Text(
-                                          "Close",
-                                          style: getDeleteTextStyle(context),
+                                          "Camera",
+                                          style: getClickableTextStyle(context, forMenu: true),
                                         ),
-                                        isDestructiveAction: true,
-                                        onPressed: () {
-                                          Navigator.pop(context);
+                                        onPressed: () async {
+                                          Navigator.of(context).pop();
+                                          getImage(ImageSource.camera, customer.guid);
                                         },
                                       ),
+                                      CupertinoActionSheetAction(
+                                        child: Text("Gallery", style: getClickableTextStyle(context, forMenu: true)),
+                                        onPressed: () async {
+                                          Navigator.of(context).pop();
+                                          getImage(ImageSource.gallery, customer.guid);
+                                        },
+                                      ),
+                                    ],
+                                    cancelButton: CupertinoActionSheetAction(
+                                      child: Text(
+                                        "Close",
+                                        style: getDeleteTextStyle(context),
+                                      ),
+                                      isDestructiveAction: true,
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
                                     ),
-                                  );
-                                },
-                                child: Text("Discard",style: getActionNegative(context),), isDestructiveAction: true,),
+                                  ),
+                                );
+                              },
+                              child: Text(
+                                "Discard",
+                                style: getActionNegative(context),
+                              ),
+                              isDestructiveAction: true,
+                            ),
                           ],
                         ),
                     filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4));
@@ -200,18 +211,6 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                 physics: ScrollPhysics(),
                 children: [
                   ListTile(
-                    leading: Icon(
-                      FontAwesomeIcons.tag,
-                      color: textColor,
-                      size: 18,
-                    ),
-                    title: Text(
-                      customer.lead.isNotEmpty ? customer.lead : "lead type unavailable",
-                      style: getDefaultTextStyle(context),
-                    ),
-                    dense: true,
-                  ),
-                  ListTile(
                     onTap: () {
                       if (customer.phone.isNotEmpty) launch("tel:${customer.phone}");
                     },
@@ -221,30 +220,32 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                       size: 18,
                     ),
                     title: Text(
-                      customer.phone.isEmpty ? "phone number unavailable" : customer.phone ?? "-",
-                      style: getDefaultTextStyle(context),
+                      customer.phone.isEmpty ? "no number" : customer.phone ?? "-",
+                      style: customer.phone.isEmpty ? getHintTextStyle(context) : getDefaultTextStyle(context),
                     ),
                     dense: true,
                   ),
                   ListTile(
-                    onTap: () {
-                      MapsLauncher.launchQuery("${customer.street}\n${customer.city}, ${customer.state.toUpperCase()} ${customer.zip}");
-                    },
-                    leading: Icon(
-                      FontAwesomeIcons.mapMarkerAlt,
-                      color: textColor,
-                      size: 18,
-                    ),
-                    title: Text(
-                      customer.street.isEmpty ? "street not found" : customer.street,
-                      style: getDefaultTextStyle(context),
-                    ),
-                    subtitle: Text(
-                      "${customer.city}, ${customer.state.toUpperCase()} ${customer.zip}",
-                      style: getDefaultTextStyle(context),
-                    ),
-                    dense: true,
-                  ),
+                      onTap: () {
+                        if (constructAddress(customer.street, customer.city, customer.state, customer.zip).isNotEmpty) {
+                          MapsLauncher.launchQuery(
+                            constructAddress(customer.street, customer.city, customer.state, customer.zip),
+                          );
+                        }
+                      },
+                      leading: Icon(
+                        FontAwesomeIcons.mapMarkerAlt,
+                        color: textColor,
+                        size: 18,
+                      ),
+                      title: Text(
+                        constructAddress(customer.street, customer.city, customer.state, customer.zip).isEmpty
+                            ? "no address"
+                            : constructAddress(customer.street, customer.city, customer.state, customer.zip),
+                        style: constructAddress(customer.street, customer.city, customer.state, customer.zip).isEmpty
+                            ? getHintTextStyle(context)
+                            : getDefaultTextStyle(context),
+                      )),
                   ListTile(
                     leading: Icon(
                       FontAwesomeIcons.solidCalendarAlt,
@@ -254,8 +255,10 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                     title: Text(
                       customer.lastCheckIn.startsWith("20")
                           ? "${dateTimeToStringDate(stringToDateTime(customer.lastCheckIn), "dd MMM, yyyy")} ${dateTimeToStringTime(stringToDateTime(customer.lastCheckIn), "hh:mm a")}"
-                          : "no check-in record found",
-                      style: getDefaultTextStyle(context),
+                          : "no check-in date",
+                      style: customer.lastCheckIn.isEmpty || !customer.lastCheckIn.startsWith("20")
+                          ? getHintTextStyle(context)
+                          : getDefaultTextStyle(context),
                     ),
                     dense: true,
                   ),

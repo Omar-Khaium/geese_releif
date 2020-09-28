@@ -26,27 +26,31 @@ class CustomerProvider extends ChangeNotifier {
 
   Future<void> getCustomers(String routeId) async {
     try {
-      Map<String, String> headers = {
-        "Authorization": user.token,
-        "PageNo": "1",
-        "PageSize": "10",
-        "RouteId": routeId,
-      };
+      if (customers.values.where((element) => element.routeId == routeId).toList().length==0) {
+        isLoading = true;
+        notifyListeners();
+        Map<String, String> headers = {
+          "Authorization": user.token,
+          "PageNo": "1",
+          "PageSize": "10",
+          "RouteId": routeId,
+        };
 
-      Response response = await NetworkHelper.apiGET(api: apiCustomers, headers: headers);
+        Response response = await NetworkHelper.apiGET(api: apiCustomers, headers: headers);
 
-      if (response.statusCode == 200) {
-        List<Map<String, dynamic>> result = List<Map<String, dynamic>>.from(json.decode(response.body)['CustomerDetail']);
-        for (Map<String, dynamic> map in result) {
-          Customer customer = Customer.fromJson(
-              map["Customers"], List<Map<String, dynamic>>.from(map["Media"]), List<Map<String, dynamic>>.from(map["Note"]), routeId);
-          if (!customers.containsKey(customer.guid)) customers[customer.guid] = customer;
+        if (response.statusCode == 200) {
+          List<Map<String, dynamic>> result = List<Map<String, dynamic>>.from(json.decode(response.body)['CustomerDetail']);
+          for (Map<String, dynamic> map in result) {
+            Customer customer = Customer.fromJson(
+                map["Customers"], List<Map<String, dynamic>>.from(map["Media"]), List<Map<String, dynamic>>.from(map["Note"]), routeId);
+            if (!customers.containsKey(customer.guid)) customers[customer.guid] = customer;
+          }
+          isLoading = false;
+          notifyListeners();
+        } else {
+          isLoading = false;
+          notifyListeners();
         }
-        isLoading = false;
-        notifyListeners();
-      } else {
-        isLoading = false;
-        notifyListeners();
       }
     } catch (error) {
       isLoading = false;
@@ -164,11 +168,11 @@ class CustomerProvider extends ChangeNotifier {
   }
 
   Future<void> saveImage(
-      BuildContext context,
-      String path,
-      String customerId,
-      CustomerProvider customerProvider,
-      ) async {
+    BuildContext context,
+    String path,
+    String customerId,
+    CustomerProvider customerProvider,
+  ) async {
     try {
       Map<String, String> headers = {
         "Authorization": user.token,
@@ -176,11 +180,10 @@ class CustomerProvider extends ChangeNotifier {
         "Path": path,
       };
 
-      Response response =
-      await NetworkHelper.apiPOST(api: apiSaveMedia, headers: headers);
+      Response response = await NetworkHelper.apiPOST(api: apiSaveMedia, headers: headers);
 
       if (response.statusCode == 200) {
-        customerProvider.newMedia(customerId, apiBaseUrl+path);
+        customerProvider.newMedia(customerId, apiBaseUrl + path);
         Navigator.of(context).pop();
         Navigator.of(context).pop();
       } else {
@@ -192,11 +195,11 @@ class CustomerProvider extends ChangeNotifier {
   }
 
   Future<void> uploadImage(
-      BuildContext context,
-      File image,
-      String customerId,
-      CustomerProvider customerProvider,
-      ) async {
+    BuildContext context,
+    File image,
+    String customerId,
+    CustomerProvider customerProvider,
+  ) async {
     try {
       Map<String, String> headers = {
         "Authorization": user.token,
@@ -207,8 +210,7 @@ class CustomerProvider extends ChangeNotifier {
         "filepath": base64.encode(image.readAsBytesSync()),
       };
 
-      Response response = await NetworkHelper.apiPOST(
-          api: apiUpload, headers: headers, body: body);
+      Response response = await NetworkHelper.apiPOST(api: apiUpload, headers: headers, body: body);
 
       if (response.statusCode == 200) {
         var result = json.decode(response.body);
@@ -224,7 +226,8 @@ class CustomerProvider extends ChangeNotifier {
   }
 
   List<Customer> customerList(String routeId) {
-    return customers.values.where((element) => element.routeId == routeId).toList();
+    List<Customer> list = customers.values.where((element) => element.routeId == routeId).toList();
+    return list;
   }
 
   clear() {

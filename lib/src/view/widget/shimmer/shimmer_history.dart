@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:geesereleif/src/view/widget/list_item/item_shimmer_history.dart';
-import 'package:geesereleif/src/view/widget/list_item/item_shimmer_route.dart';
 
 class ShimmerHistory extends StatelessWidget {
   @override

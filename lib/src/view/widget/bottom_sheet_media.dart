@@ -16,10 +16,8 @@ class PhotoPreview extends StatelessWidget {
       child: files.length == 0
           ? Center(
               child: Text(
-                "No media files found!",
-                style: getCaptionTextStyle(
-                  context,
-                ),
+                "No media found!",
+                style: getHintTextStyle(context),
               ),
             )
           : GridView.count(

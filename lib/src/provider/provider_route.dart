@@ -23,6 +23,7 @@ class RouteProvider extends ChangeNotifier {
     try {
       Map<String, String> headers = {
         "Authorization": user.token,
+        "UserId": user.guid,
         "PageNo": "1",
         "PageSize": "10",
       };
@@ -55,6 +56,7 @@ class RouteProvider extends ChangeNotifier {
     try {
       Map<String, String> headers = {
         "Authorization": user.token,
+        "UserId": user.guid,
         "PageNo": "1",
         "PageSize": "10",
       };

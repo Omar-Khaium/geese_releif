@@ -17,6 +17,7 @@ dependencies:
   hive:
   hive_flutter:
   shimmer:
+  flushbar: 1.10.0
   intl:
   url_launcher:
   keyboard_visibility:

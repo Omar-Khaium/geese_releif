@@ -14,13 +14,16 @@ class HistoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final customerProvider =
-        Provider.of<CustomerProvider>(context, listen: false);
+    final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
     final historyProvider = Provider.of<HistoryProvider>(context, listen: true);
-    historyProvider.init();
-    if (historyProvider.getAllHistories.length == 0) {
-      historyProvider.getHistory(customerProvider);
-    }
+
+
+    Future.delayed(Duration(milliseconds: 1), (){
+      historyProvider.init();
+      if (historyProvider.getAllHistories.length == 0) {
+        historyProvider.getHistory(customerProvider);
+      }
+    });
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
@@ -68,8 +71,7 @@ class HistoryScreen extends StatelessWidget {
           IconButton(
             onPressed: () {
               historyProvider.logout();
-              Navigator.of(context)
-                  .pushReplacementNamed(LoginScreen().routeName);
+              Navigator.of(context).pushReplacementNamed(LoginScreen().routeName);
             },
             icon: Icon(FontAwesomeIcons.signOutAlt, color: Colors.black),
           ),
@@ -78,23 +80,38 @@ class HistoryScreen extends StatelessWidget {
       body: historyProvider.isLoading
           ? ShimmerHistory()
           : historyProvider.getAllHistories.length == 0
-              ? Center(
-                  child: Text(
-                    "No History available",
-                    style: getHintTextStyle(context),
+              ? RefreshIndicator(
+                  onRefresh: () => historyProvider.refreshHistory(customerProvider),
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height - (MediaQuery.of(context).padding.top + kToolbarHeight),
+                    alignment: Alignment.center,
+                    child: ListView(
+                      shrinkWrap: false,
+                      scrollDirection: Axis.vertical,
+                      physics: AlwaysScrollableScrollPhysics(),
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.height - (MediaQuery.of(context).padding.top + kToolbarHeight),
+                          alignment: Alignment.center,
+                          child: Text(
+                            "No route available",
+                            style: getHintTextStyle(context),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 )
               : RefreshIndicator(
-                  onRefresh: () {
-                    return historyProvider.refreshHistory(customerProvider);
-                  },
+                  onRefresh: () => historyProvider.refreshHistory(customerProvider),
                   child: ListView.builder(
                     shrinkWrap: false,
                     scrollDirection: Axis.vertical,
                     physics: AlwaysScrollableScrollPhysics(),
                     padding: EdgeInsets.symmetric(horizontal: 16),
-                    itemBuilder: (context, index) =>
-                        HistoryItem(historyProvider.getAllHistories[index]),
+                    itemBuilder: (context, index) => HistoryItem(historyProvider.getAllHistories[index]),
                     itemCount: historyProvider.getAllHistories.length,
                   ),
                 ),

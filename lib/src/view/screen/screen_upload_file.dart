@@ -1,13 +1,10 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geesereleif/src/provider/provider_customer.dart';
 import 'package:geesereleif/src/util/constraints.dart';
-import 'package:geesereleif/src/util/network_helper.dart';
 import 'package:geesereleif/src/view/widget/widget_loading.dart';
-import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
 class UploadFileScreen extends StatelessWidget {

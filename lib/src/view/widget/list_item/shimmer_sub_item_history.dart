@@ -1,11 +1,5 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:geesereleif/src/model/history_item.dart';
-import 'package:geesereleif/src/view/screen/screen_customer_details.dart';
 import 'package:geesereleif/src/util/constraints.dart';
-import 'package:geesereleif/src/util/helper.dart';
 
 class ShimmerHistorySubItem extends StatelessWidget {
   final bool isLastItem;

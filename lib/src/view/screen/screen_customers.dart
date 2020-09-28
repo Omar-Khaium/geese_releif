@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -19,10 +17,13 @@ class CustomersScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final customerProvider = Provider.of<CustomerProvider>(context);
     final String routeId = ModalRoute.of(context).settings.arguments as String;
-    customerProvider.init();
-    if (customerProvider.customerList(routeId).length == 0) {
-      customerProvider.getCustomers(routeId);
-    }
+
+    Future.delayed(Duration(milliseconds: 1), (){
+      customerProvider.init();
+      if (customerProvider.customerList(routeId).length == 0) {
+        customerProvider.getCustomers(routeId);
+      }
+    });
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
@@ -56,8 +57,7 @@ class CustomersScreen extends StatelessWidget {
           IconButton(
             onPressed: () {
               customerProvider.logout();
-              Navigator.of(context)
-                  .pushReplacementNamed(LoginScreen().routeName);
+              Navigator.of(context).pushReplacementNamed(LoginScreen().routeName);
             },
             icon: Icon(
               FontAwesomeIcons.signOutAlt,
@@ -69,16 +69,32 @@ class CustomersScreen extends StatelessWidget {
       body: customerProvider.isLoading
           ? ShimmerCustomer()
           : customerProvider.customerList(routeId).length == 0
-              ? Center(
-                  child: Text(
-                    "No customer available",
-                    style: getHintTextStyle(context),
+              ? RefreshIndicator(
+                  onRefresh: () => customerProvider.refreshCustomers(routeId),
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height - (MediaQuery.of(context).padding.top+kToolbarHeight),
+                    alignment: Alignment.center,
+                    child: ListView(
+                      shrinkWrap: false,
+                      scrollDirection: Axis.vertical,
+                      physics: AlwaysScrollableScrollPhysics(),
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.height - (MediaQuery.of(context).padding.top+kToolbarHeight),
+                          alignment: Alignment.center,
+                          child: Text(
+                            "No customer available",
+                            style: getHintTextStyle(context),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 )
               : RefreshIndicator(
-                  onRefresh: () {
-                    return customerProvider.refreshCustomers(routeId);
-                  },
+                  onRefresh: () => customerProvider.refreshCustomers(routeId),
                   child: ListView.separated(
                     shrinkWrap: false,
                     scrollDirection: Axis.vertical,
@@ -88,8 +104,7 @@ class CustomersScreen extends StatelessWidget {
                       thickness: .25,
                     ),
                     itemBuilder: (context, index) {
-                      final Customer customer =
-                          customerProvider.customerList(routeId)[index];
+                      final Customer customer = customerProvider.customerList(routeId)[index];
                       return CustomerItem(customer);
                     },
                     itemCount: customerProvider.customerList(routeId).length,

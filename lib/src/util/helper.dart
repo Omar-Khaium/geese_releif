@@ -1,3 +1,5 @@
+import 'package:flushbar/flushbar.dart';
+import 'package:flutter/material.dart';
 import 'package:geesereleif/src/model/history.dart';
 import 'package:geesereleif/src/model/history_item.dart';
 import 'package:geesereleif/src/util/constraints.dart';
@@ -99,4 +101,56 @@ LogType parseLogType(String log) {
     default:
       return LogType.CheckedOut;
   }
+}
+
+String constructAddress(String street, String city, String state, String zip) {
+  String line_1 = refineString(street).trim();
+  String zipCode = refineString(zip).trim();
+  String stateName = refineString(state).trim();
+  String cityName = refineString(city).trim();
+  String line_2 = "${zipCode.isEmpty ? (stateName.isEmpty ? (cityName.isEmpty ? "" : cityName) : "$cityName, $stateName") : (stateName.isEmpty ? (cityName.isEmpty ? zipCode : "$cityName, $zipCode") : "$cityName, $stateName $zipCode")}";
+  return "${line_2.isEmpty ? line_1 : "$line_1\n$line_2"}";
+}
+
+String refineString(String value){
+  return value ?? "";
+}
+
+
+void alertERROR(
+    {@required BuildContext context, @required String message}) {
+  Flushbar(
+    flushbarPosition: FlushbarPosition.TOP,
+    flushbarStyle: FlushbarStyle.GROUNDED,
+    backgroundColor: Colors.redAccent.shade200,
+    duration: Duration(seconds: 4),
+    boxShadows: [
+      BoxShadow(
+        color: Colors.red.shade100,
+        offset: Offset(0.0, 0.0),
+        blurRadius: 1.0,
+      )
+    ],
+    title: "Something Went Wrong",
+    message: message,
+  )..show(context);
+}
+
+void alertSuccess(
+    {@required BuildContext context, @required String message}) {
+  Flushbar(
+    flushbarPosition: FlushbarPosition.TOP,
+    flushbarStyle: FlushbarStyle.GROUNDED,
+    backgroundColor: Colors.greenAccent.shade700,
+    duration: Duration(seconds: 4),
+    boxShadows: [
+      BoxShadow(
+        color: Colors.green.shade100,
+        offset: Offset(0.0, 0.0),
+        blurRadius: 1.0,
+      )
+    ],
+    title: "Congratulations",
+    message: message,
+  )..show(context);
 }

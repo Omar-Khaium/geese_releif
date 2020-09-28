@@ -20,8 +20,8 @@ class ShimmerHistoryItem extends StatelessWidget {
             margin: EdgeInsets.only(bottom: 4, left: 12, right: 12),
           ),
           ListView.builder(
-            itemBuilder: (context, index) => ShimmerHistorySubItem(index == 9),
-            itemCount: 10,
+            itemBuilder: (context, index) => ShimmerHistorySubItem(index == 1),
+            itemCount: 2,
             shrinkWrap: true,
             scrollDirection: Axis.vertical,
             physics: ScrollPhysics(),

@@ -2,10 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geesereleif/src/provider/provider_route.dart';
+import 'package:geesereleif/src/util/constraints.dart';
 import 'package:geesereleif/src/view/screen/screen_customers.dart';
 import 'package:geesereleif/src/view/screen/screen_history.dart';
 import 'package:geesereleif/src/view/screen/screen_login.dart';
-import 'package:geesereleif/src/util/constraints.dart';
 import 'package:geesereleif/src/view/widget/shimmer/shimmer_route.dart';
 import 'package:provider/provider.dart';
 
@@ -15,10 +15,13 @@ class RoutesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final routeProvider = Provider.of<RouteProvider>(context);
-    if (routeProvider.routeList.length == 0) {
-      routeProvider.init();
-      routeProvider.getRoutes();
-    }
+
+    Future.delayed(Duration(milliseconds: 1), () {
+      if (routeProvider.routeList.length == 0) {
+        routeProvider.init();
+        routeProvider.getRoutes();
+      }
+    });
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -65,16 +68,32 @@ class RoutesScreen extends StatelessWidget {
       body: routeProvider.isLoading
           ? ShimmerRoute()
           : routeProvider.routeList.length == 0
-              ? Center(
-                  child: Text(
-                    "No routes available",
-                    style: getHintTextStyle(context),
+              ? RefreshIndicator(
+                  onRefresh: () => routeProvider.refreshRoutes(),
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height - (MediaQuery.of(context).padding.top + kToolbarHeight),
+                    alignment: Alignment.center,
+                    child: ListView(
+                      shrinkWrap: false,
+                      scrollDirection: Axis.vertical,
+                      physics: AlwaysScrollableScrollPhysics(),
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.height - (MediaQuery.of(context).padding.top + kToolbarHeight),
+                          alignment: Alignment.center,
+                          child: Text(
+                            "No route available",
+                            style: getHintTextStyle(context),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 )
               : RefreshIndicator(
-                  onRefresh: () {
-                    return routeProvider.refreshRoutes();
-                  },
+                  onRefresh: () => routeProvider.refreshRoutes(),
                   child: ListView.separated(
                     shrinkWrap: false,
                     scrollDirection: Axis.vertical,

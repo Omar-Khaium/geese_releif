@@ -17,7 +17,12 @@ class NotesPreview extends StatelessWidget {
 
     return Container(
       height: MediaQuery.of(context).size.height * .5,
-      child: ListView.builder(
+      child: list.length==0 ? Center(
+        child: Text(
+          "No note found!",
+          style: getHintTextStyle(context),
+        ),
+      ) : ListView.builder(
         padding: EdgeInsets.only(top: 16, bottom: 16),
         scrollDirection: Axis.vertical,
         shrinkWrap: true,
