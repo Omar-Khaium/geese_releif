@@ -27,7 +27,10 @@ class CustomerProvider extends ChangeNotifier {
 
   Future<void> getCustomers(String routeId, BuildContext context) async {
     try {
-      if (customers.values.where((element) => element.routeId == routeId).toList().length == 0) {
+      if (customers.values
+          .where((element) => element.routeId == routeId)
+          .toList()
+          .length == 0) {
         isLoading = true;
         notifyListeners();
         Map<String, String> headers = {
@@ -209,12 +212,10 @@ class CustomerProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> saveImage(
-    BuildContext context,
-    String path,
-    String customerId,
-    CustomerProvider customerProvider,
-  ) async {
+  Future<void> saveImage(BuildContext context,
+      String path,
+      String customerId,
+      CustomerProvider customerProvider,) async {
     try {
       Map<String, String> headers = {
         "Authorization": user.token,
@@ -243,19 +244,19 @@ class CustomerProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> uploadImage(
-    BuildContext context,
-    File image,
-    String customerId,
-    CustomerProvider customerProvider,
-  ) async {
+  Future<bool> uploadImage(BuildContext context,
+      File image,
+      String customerId,
+      CustomerProvider customerProvider,) async {
     try {
       Map<String, String> headers = {
         "Authorization": user.token,
         "Content-Type": "application/x-www-form-urlencoded",
       };
       Map<String, String> body = {
-        "filename": "${DateTime.now().millisecondsSinceEpoch}.png",
+        "filename": "${DateTime
+            .now()
+            .millisecondsSinceEpoch}.png",
         "filepath": base64.encode(image.readAsBytesSync()),
       };
 
@@ -327,5 +328,10 @@ class CustomerProvider extends ChangeNotifier {
   logout() {
     user.isAuthenticated = false;
     userBox.putAt(0, user);
+  }
+
+  changeLastCheckInOutTime(String date, String guid) {
+    customers[guid].lastCheckIn = date;
+    notifyListeners();
   }
 }

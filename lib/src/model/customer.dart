@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:geesereleif/src/model/note.dart';
 import 'package:geesereleif/src/model/media_file.dart';
+import 'package:geesereleif/src/util/helper.dart';
 
 class Customer {
   String guid;
@@ -47,7 +50,7 @@ class Customer {
       city = customer["City"];
       state = customer["State"];
       zip = customer["Zip"];
-      lastCheckIn = customer["LastCheckedInTime"];
+      lastCheckIn = refineUTC(customer["LastCheckedInTime"].toString().contains(".") ? customer["LastCheckedInTime"] : "${customer["LastCheckedInTime"]}.000", "yyyy-MM-dd'T'HH:mm:ss.SSS");
       geeseCount = customer["GeeseCount"];
       isCheckedIn = customer["IsCheckedIn"];
 

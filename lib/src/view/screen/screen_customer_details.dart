@@ -490,6 +490,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                                   customerProvider,
                                   onSave: (count) {
                                     customerProvider.newCheckIn(customer.guid, count);
+                                    customerProvider.changeLastCheckInOutTime(DateTime.now().toIso8601String(), customer.guid);
                                     historyProvider.newCheckIn(customer);
                                   },
                                 ),
