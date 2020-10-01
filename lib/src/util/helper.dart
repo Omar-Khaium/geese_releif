@@ -43,6 +43,83 @@ int doesHistoryExists(List<History> histories, History history) {
   return -1;
 }
 
+void showNetworkResponse(
+    {@required BuildContext context, @required String message}) {
+  Flushbar(
+    flushbarPosition: FlushbarPosition.TOP,
+    flushbarStyle: FlushbarStyle.GROUNDED,
+    backgroundColor: Colors.greenAccent.shade700,
+    duration: Duration(seconds: 4),
+    boxShadows: [
+      BoxShadow(
+        color: Colors.green.shade200,
+        offset: Offset(0.0, 0.0),
+        blurRadius: 1.0,
+      )
+    ],
+    title: "Congratulations",
+    message: message,
+  )..show(context);
+}
+
+void showNetworkResponseFailed(
+    {@required BuildContext context, @required String message}) {
+  Flushbar(
+    flushbarPosition: FlushbarPosition.TOP,
+    flushbarStyle: FlushbarStyle.GROUNDED,
+    backgroundColor: Colors.greenAccent.shade700,
+    duration: Duration(seconds: 4),
+    boxShadows: [
+      BoxShadow(
+        color: Colors.red.shade100,
+        offset: Offset(0.0, 0.0),
+        blurRadius: 1.0,
+      )
+    ],
+    title: "Congratulations",
+    message: message,
+  )..show(context);
+}
+
+void showNetworkError({@required BuildContext context, String message}) {
+  Flushbar(
+    flushbarPosition: FlushbarPosition.TOP,
+    flushbarStyle: FlushbarStyle.GROUNDED,
+    backgroundColor: Colors.red.shade400,
+    duration: Duration(seconds: 4),
+    boxShadows: [
+      BoxShadow(
+        color: Colors.red.shade200,
+        offset: Offset(0.0, 0.0),
+        blurRadius: 1.0,
+      )
+    ],
+    title: "Something Went Wrong",
+    message: message == null
+        ? "Please Try Again Later"
+        : message == null ? "Network Error" : message,
+  )..show(context);
+}
+
+void showRuntimeError(
+    {@required BuildContext context, @required String message}) {
+  Flushbar(
+    flushbarPosition: FlushbarPosition.TOP,
+    flushbarStyle: FlushbarStyle.GROUNDED,
+    backgroundColor: Colors.redAccent.shade200,
+    duration: Duration(seconds: 4),
+    boxShadows: [
+      BoxShadow(
+        color: Colors.red.shade100,
+        offset: Offset(0.0, 0.0),
+        blurRadius: 1.0,
+      )
+    ],
+    title: "Something Went Wrong",
+    message: message,
+  )..show(context);
+}
+
 DateTime stringToDateTime(String date) {
   DateTime dateTime = DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").parse(date);
   return dateTime;
@@ -108,17 +185,16 @@ String constructAddress(String street, String city, String state, String zip) {
   String zipCode = refineString(zip).trim();
   String stateName = refineString(state).trim();
   String cityName = refineString(city).trim();
-  String line_2 = "${zipCode.isEmpty ? (stateName.isEmpty ? (cityName.isEmpty ? "" : cityName) : "$cityName, $stateName") : (stateName.isEmpty ? (cityName.isEmpty ? zipCode : "$cityName, $zipCode") : "$cityName, $stateName $zipCode")}";
+  String line_2 =
+      "${zipCode.isEmpty ? (stateName.isEmpty ? (cityName.isEmpty ? "" : cityName) : "$cityName, $stateName") : (stateName.isEmpty ? (cityName.isEmpty ? zipCode : "$cityName, $zipCode") : "$cityName, $stateName $zipCode")}";
   return "${line_2.isEmpty ? line_1 : "$line_1\n$line_2"}";
 }
 
-String refineString(String value){
+String refineString(String value) {
   return value ?? "";
 }
 
-
-void alertERROR(
-    {@required BuildContext context, @required String message}) {
+void alertERROR({@required BuildContext context, @required String message}) {
   Flushbar(
     flushbarPosition: FlushbarPosition.TOP,
     flushbarStyle: FlushbarStyle.GROUNDED,
@@ -136,8 +212,7 @@ void alertERROR(
   )..show(context);
 }
 
-void alertSuccess(
-    {@required BuildContext context, @required String message}) {
+void alertSuccess({@required BuildContext context, @required String message}) {
   Flushbar(
     flushbarPosition: FlushbarPosition.TOP,
     flushbarStyle: FlushbarStyle.GROUNDED,

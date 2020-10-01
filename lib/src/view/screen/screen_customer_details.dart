@@ -4,17 +4,17 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:geesereleif/src/model/note.dart';
 import 'package:geesereleif/src/model/customer.dart';
+import 'package:geesereleif/src/model/note.dart';
 import 'package:geesereleif/src/provider/provider_customer.dart';
 import 'package:geesereleif/src/provider/provider_history.dart';
 import 'package:geesereleif/src/provider/provider_keyboard.dart';
-import 'package:geesereleif/src/view/screen/screen_upload_file.dart';
 import 'package:geesereleif/src/util/constraints.dart';
 import 'package:geesereleif/src/util/helper.dart';
+import 'package:geesereleif/src/view/screen/screen_upload_file.dart';
 import 'package:geesereleif/src/view/widget/bottom_sheet_check_in.dart';
-import 'package:geesereleif/src/view/widget/bottom_sheet_notes.dart';
 import 'package:geesereleif/src/view/widget/bottom_sheet_media.dart';
+import 'package:geesereleif/src/view/widget/bottom_sheet_notes.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:maps_launcher/maps_launcher.dart';
@@ -37,9 +37,12 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final String id = ModalRoute.of(context).settings.arguments as String;
-    final customerProvider = Provider.of<CustomerProvider>(context, listen: true);
-    final historyProvider = Provider.of<HistoryProvider>(context, listen: false);
-    final keyboardProvider = Provider.of<KeyboardProvider>(context, listen: true);
+    final customerProvider =
+        Provider.of<CustomerProvider>(context, listen: true);
+    final historyProvider =
+        Provider.of<HistoryProvider>(context, listen: false);
+    final keyboardProvider =
+        Provider.of<KeyboardProvider>(context, listen: true);
     final Customer customer = customerProvider.findCustomerByID(id);
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -59,7 +62,8 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                             "Discard note?",
                             style: getAppBarTextStyle(context),
                           ),
-                          content: Text("You haven't shared your note yet. Are you sure that you want to leave without posting?"),
+                          content: Text(
+                              "You haven't shared your note yet. Are you sure that you want to leave without posting?"),
                           actions: [
                             CupertinoActionSheetAction(
                               onPressed: () {
@@ -79,24 +83,31 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                                 Navigator.of(context).pop();
                                 showCupertinoModalPopup(
                                   context: context,
-                                  filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                                  filter:
+                                      ImageFilter.blur(sigmaX: 4, sigmaY: 4),
                                   builder: (context) => CupertinoActionSheet(
                                     actions: <Widget>[
                                       CupertinoActionSheetAction(
                                         child: Text(
                                           "Camera",
-                                          style: getClickableTextStyle(context, forMenu: true),
+                                          style: getClickableTextStyle(context,
+                                              forMenu: true),
                                         ),
                                         onPressed: () async {
                                           Navigator.of(context).pop();
-                                          getImage(ImageSource.camera, customer.guid);
+                                          getImage(ImageSource.camera,
+                                              customer.guid);
                                         },
                                       ),
                                       CupertinoActionSheetAction(
-                                        child: Text("Gallery", style: getClickableTextStyle(context, forMenu: true)),
+                                        child: Text("Gallery",
+                                            style: getClickableTextStyle(
+                                                context,
+                                                forMenu: true)),
                                         onPressed: () async {
                                           Navigator.of(context).pop();
-                                          getImage(ImageSource.gallery, customer.guid);
+                                          getImage(ImageSource.gallery,
+                                              customer.guid);
                                         },
                                       ),
                                     ],
@@ -139,7 +150,9 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                         },
                       ),
                       CupertinoActionSheetAction(
-                        child: Text("Gallery", style: getClickableTextStyle(context, forMenu: true)),
+                        child: Text("Gallery",
+                            style:
+                                getClickableTextStyle(context, forMenu: true)),
                         onPressed: () async {
                           Navigator.of(context).pop();
                           getImage(ImageSource.gallery, customer.guid);
@@ -212,7 +225,8 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                 children: [
                   ListTile(
                     onTap: () {
-                      if (customer.phone.isNotEmpty) launch("tel:${customer.phone}");
+                      if (customer.phone.isNotEmpty)
+                        launch("tel:${customer.phone}");
                     },
                     leading: Icon(
                       FontAwesomeIcons.phoneAlt,
@@ -220,16 +234,23 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                       size: 18,
                     ),
                     title: Text(
-                      customer.phone.isEmpty ? "no number" : customer.phone ?? "-",
-                      style: customer.phone.isEmpty ? getHintTextStyle(context) : getDefaultTextStyle(context),
+                      customer.phone.isEmpty
+                          ? "no number"
+                          : customer.phone ?? "-",
+                      style: customer.phone.isEmpty
+                          ? getHintTextStyle(context)
+                          : getDefaultTextStyle(context),
                     ),
                     dense: true,
                   ),
                   ListTile(
                       onTap: () {
-                        if (constructAddress(customer.street, customer.city, customer.state, customer.zip).isNotEmpty) {
+                        if (constructAddress(customer.street, customer.city,
+                                customer.state, customer.zip)
+                            .isNotEmpty) {
                           MapsLauncher.launchQuery(
-                            constructAddress(customer.street, customer.city, customer.state, customer.zip),
+                            constructAddress(customer.street, customer.city,
+                                customer.state, customer.zip),
                           );
                         }
                       },
@@ -239,10 +260,15 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                         size: 18,
                       ),
                       title: Text(
-                        constructAddress(customer.street, customer.city, customer.state, customer.zip).isEmpty
+                        constructAddress(customer.street, customer.city,
+                                    customer.state, customer.zip)
+                                .isEmpty
                             ? "no address"
-                            : constructAddress(customer.street, customer.city, customer.state, customer.zip),
-                        style: constructAddress(customer.street, customer.city, customer.state, customer.zip).isEmpty
+                            : constructAddress(customer.street, customer.city,
+                                customer.state, customer.zip),
+                        style: constructAddress(customer.street, customer.city,
+                                    customer.state, customer.zip)
+                                .isEmpty
                             ? getHintTextStyle(context)
                             : getDefaultTextStyle(context),
                       )),
@@ -256,7 +282,8 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                       customer.lastCheckIn.startsWith("20")
                           ? "${dateTimeToStringDate(stringToDateTime(customer.lastCheckIn), "dd MMM, yyyy")} ${dateTimeToStringTime(stringToDateTime(customer.lastCheckIn), "hh:mm a")}"
                           : "no check-in date",
-                      style: customer.lastCheckIn.isEmpty || !customer.lastCheckIn.startsWith("20")
+                      style: customer.lastCheckIn.isEmpty ||
+                              !customer.lastCheckIn.startsWith("20")
                           ? getHintTextStyle(context)
                           : getDefaultTextStyle(context),
                     ),
@@ -319,7 +346,8 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                               builder: (context) => WillPopScope(
                                     onWillPop: () async => false,
                                     child: BackdropFilter(
-                                      filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                                      filter: ImageFilter.blur(
+                                          sigmaX: 4, sigmaY: 4),
                                       child: AlertDialog(
                                         elevation: 0,
                                         backgroundColor: Colors.transparent,
@@ -329,7 +357,8 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                                       ),
                                     ),
                                   ));
-                          bool response = await customerProvider.sendNote(id, customer.guid, _noteController.text);
+                          bool response = await customerProvider.sendNote(
+                              context, id, customer.guid, _noteController.text);
                           Navigator.of(context).pop();
                           if (response) {
                             customerProvider.newNote(
@@ -342,6 +371,13 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                             setState(() {
                               _noteController.text = "";
                             });
+
+                            showNetworkResponse(
+                                context: context,
+                                message: "Note Added Successfully!");
+                          } else {
+                            showNetworkResponseFailed(
+                                context: context, message: "Failed");
                           }
                           FocusScope.of(context).requestFocus(FocusNode());
                         },
@@ -371,7 +407,8 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                           onTap: () {
                             showModalBottomSheet(
                               context: context,
-                              builder: (context) => PhotoPreview(customer.mediaList),
+                              builder: (context) =>
+                                  PhotoPreview(customer.mediaList),
                             );
                           },
                           child: Container(
@@ -404,7 +441,8 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                                   ),
                                   Text(
                                     customer.mediaList.length.toString(),
-                                    style: getClickableTextStyle(context, forCount: true),
+                                    style: getClickableTextStyle(context,
+                                        forCount: true),
                                   ),
                                 ],
                               ),
@@ -418,7 +456,10 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                           splashColor: Colors.transparent,
                           highlightColor: Colors.transparent,
                           onTap: () {
-                            showModalBottomSheet(context: context, builder: (context) => NotesPreview(customer.noteList));
+                            showModalBottomSheet(
+                                context: context,
+                                builder: (context) =>
+                                    NotesPreview(customer.noteList));
                           },
                           child: Container(
                             width: MediaQuery.of(context).size.width * .4,
@@ -450,7 +491,8 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                                   ),
                                   Text(
                                     customer.noteList.length.toString(),
-                                    style: getClickableTextStyle(context, forCount: true),
+                                    style: getClickableTextStyle(context,
+                                        forCount: true),
                                   ),
                                 ],
                               ),
@@ -474,7 +516,13 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                 height: 54,
                 decoration: BoxDecoration(
                     color: customer.isCheckedIn ? Colors.red : accentColor,
-                    boxShadow: [BoxShadow(offset: Offset(0, 1), color: Colors.grey.shade100, spreadRadius: 8, blurRadius: 8)]),
+                    boxShadow: [
+                      BoxShadow(
+                          offset: Offset(0, 1),
+                          color: Colors.grey.shade100,
+                          spreadRadius: 8,
+                          blurRadius: 8)
+                    ]),
                 child: InkWell(
                   onTap: keyboardProvider.isKeyboardVisible
                       ? null
@@ -489,7 +537,8 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                                   customer,
                                   customerProvider,
                                   onSave: (count) {
-                                    customerProvider.newCheckIn(customer.guid, count);
+                                    customerProvider.newCheckIn(
+                                        customer.guid, count);
                                     historyProvider.newCheckIn(customer);
                                   },
                                 ),
@@ -502,7 +551,8 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                                 builder: (context) => WillPopScope(
                                       onWillPop: () async => false,
                                       child: BackdropFilter(
-                                        filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                                        filter: ImageFilter.blur(
+                                            sigmaX: 4, sigmaY: 4),
                                         child: AlertDialog(
                                           elevation: 0,
                                           backgroundColor: Colors.transparent,
@@ -512,12 +562,19 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                                         ),
                                       ),
                                     ));
-                            bool result = await customerProvider.checkOut(customer.guid);
+                            bool result =
+                                await customerProvider.checkOut(customer.guid);
+                            Navigator.of(context).pop();
                             if (result) {
                               customerProvider.newCheckOut(customer.guid);
                               historyProvider.newCheckOut(customer);
+                              showNetworkResponse(
+                                  context: context,
+                                  message: "Checked out successfully!");
+                            } else {
+                              showNetworkResponseFailed(
+                                  context: context, message: "Checkout failed");
                             }
-                            Navigator.of(context).pop();
                           }
                         },
                   splashColor: Colors.black,

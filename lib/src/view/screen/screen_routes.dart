@@ -36,27 +36,33 @@ class RoutesScreen extends StatelessWidget {
           style: getAppBarTextStyle(context),
         ),
         actions: [
-          ActionChip(
-            onPressed: () {
-              Navigator.of(context).pushNamed(HistoryScreen().routeName);
-            },
-            label: Text(
-              "History",
-              style: getDefaultTextStyle(context),
+          Visibility(
+            visible: false,
+            child: ActionChip(
+              onPressed: () {
+                Navigator.of(context).pushNamed(HistoryScreen().routeName);
+              },
+              label: Visibility(
+                child: Text(
+                  "History",
+                  style: getDefaultTextStyle(context),
+                ),
+              ),
+              labelPadding: const EdgeInsets.only(right: 4),
+              avatar: Icon(
+                FontAwesomeIcons.history,
+                size: 14,
+                color: Colors.grey.shade700,
+              ),
+              backgroundColor: Colors.grey.shade200,
+              elevation: 0,
             ),
-            labelPadding: const EdgeInsets.only(right: 4),
-            avatar: Icon(
-              FontAwesomeIcons.history,
-              size: 14,
-              color: Colors.grey.shade700,
-            ),
-            backgroundColor: Colors.grey.shade200,
-            elevation: 0,
           ),
           IconButton(
             onPressed: () {
               routeProvider.logout();
-              Navigator.of(context).pushReplacementNamed(LoginScreen().routeName);
+              Navigator.of(context)
+                  .pushReplacementNamed(LoginScreen().routeName);
             },
             icon: Icon(
               FontAwesomeIcons.signOutAlt,
@@ -72,7 +78,8 @@ class RoutesScreen extends StatelessWidget {
                   onRefresh: () => routeProvider.refreshRoutes(),
                   child: Container(
                     width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height - (MediaQuery.of(context).padding.top + kToolbarHeight),
+                    height: MediaQuery.of(context).size.height -
+                        (MediaQuery.of(context).padding.top + kToolbarHeight),
                     alignment: Alignment.center,
                     child: ListView(
                       shrinkWrap: false,
@@ -81,7 +88,9 @@ class RoutesScreen extends StatelessWidget {
                       children: [
                         Container(
                           width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.height - (MediaQuery.of(context).padding.top + kToolbarHeight),
+                          height: MediaQuery.of(context).size.height -
+                              (MediaQuery.of(context).padding.top +
+                                  kToolbarHeight),
                           alignment: Alignment.center,
                           child: Text(
                             "No route available",
@@ -105,7 +114,9 @@ class RoutesScreen extends StatelessWidget {
                     itemBuilder: (context, index) => ListTile(
                       dense: true,
                       onTap: () {
-                        Navigator.of(context).pushNamed(CustomersScreen().routeName, arguments: routeProvider.routeList[index].guid);
+                        Navigator.of(context).pushNamed(
+                            CustomersScreen().routeName,
+                            arguments: routeProvider.routeList[index].guid);
                       },
                       trailing: Icon(
                         Icons.keyboard_arrow_right,

@@ -5,9 +5,10 @@ import 'package:geesereleif/src/model/user.dart';
 import 'package:geesereleif/src/provider/provider_customer.dart';
 import 'package:geesereleif/src/provider/provider_history.dart';
 import 'package:geesereleif/src/provider/provider_route.dart';
-import 'package:geesereleif/src/view/screen/screen_routes.dart';
 import 'package:geesereleif/src/util/constraints.dart';
+import 'package:geesereleif/src/util/helper.dart';
 import 'package:geesereleif/src/util/network_helper.dart';
+import 'package:geesereleif/src/view/screen/screen_routes.dart';
 import 'package:geesereleif/src/view/widget/widget_loading.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart';
@@ -34,8 +35,10 @@ class _LoginFormState extends State<LoginForm> {
   void initState() {
     userBox = Hive.box("users");
     user = userBox.length > 0 ? userBox.getAt(0) : User();
-    _usernameController.text = user.isRemembered ?? false ? user.email ?? "" : "";
-    _passwordController.text = user.isRemembered ?? false ? user.password ?? "" : "";
+    _usernameController.text =
+        user.isRemembered ?? false ? user.email ?? "" : "";
+    _passwordController.text =
+        user.isRemembered ?? false ? user.password ?? "" : "";
     _isRemembered = user.isRemembered ?? false;
     super.initState();
   }
@@ -43,8 +46,10 @@ class _LoginFormState extends State<LoginForm> {
   @override
   Widget build(BuildContext context) {
     final routeProvider = Provider.of<RouteProvider>(context, listen: false);
-    final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
-    final historyProvider = Provider.of<HistoryProvider>(context, listen: false);
+    final customerProvider =
+        Provider.of<CustomerProvider>(context, listen: false);
+    final historyProvider =
+        Provider.of<HistoryProvider>(context, listen: false);
     Future.delayed(Duration(milliseconds: 0), () {
       routeProvider.clear();
       customerProvider.clear();
@@ -151,7 +156,9 @@ class _LoginFormState extends State<LoginForm> {
                   user.email = _usernameController.text;
                   user.password = _passwordController.text;
                   FocusScope.of(context).requestFocus(FocusNode());
-                  showDialog(context: context, builder: (context) => Loading(Colors.blue));
+                  showDialog(
+                      context: context,
+                      builder: (context) => Loading(Colors.blue));
                   login();
                 }
               },
@@ -179,22 +186,24 @@ class _LoginFormState extends State<LoginForm> {
         user.isAuthenticated = true;
         user.token = "${result["token_type"]} ${result["access_token"]} ";
         Navigator.of(context).pop();
-        showDialog(context: context, builder: (context) => Loading(Colors.green));
+        /*showDialog(
+            context: context, builder: (context) => Loading(Colors.green));*/
+
+        showNetworkResponse(context: context, message: "Login Successful");
         getProfileData();
+      } else if (response.statusCode == 500) {
+        Navigator.of(context).pop();
+        showNetworkError(context: context);
+      } else if (response.statusCode == 400) {
+        Navigator.of(context).pop();
+        showNetworkError(context: context, message: "Wrong Credentials");
       } else {
         user.isAuthenticated = false;
-        /*StatusAlert.show(
-          context,
-          duration: Duration(milliseconds: 100),
-          title: 'Authentication Failed',
-          subtitle: 'internal server error',
-          configuration: IconConfiguration(icon: Icons.lock),
-        );*/
         Navigator.of(context).pop();
+        showNetworkError(context: context);
       }
     } catch (error) {
       user.isAuthenticated = false;
-      print(error);
       /*StatusAlert.show(
         context,
         duration: Duration(milliseconds: 100),
@@ -203,6 +212,7 @@ class _LoginFormState extends State<LoginForm> {
         configuration: IconConfiguration(icon: Icons.lock),
       );*/
       Navigator.of(context).pop();
+      showNetworkError(context: context);
     }
   }
 
@@ -238,7 +248,7 @@ class _LoginFormState extends State<LoginForm> {
         Navigator.of(context).pop();
       }
     } catch (error) {
-      print(error);
+      showNetworkError(context: context);
       /*StatusAlert.show(
         context,
         duration: Duration(milliseconds: 500),

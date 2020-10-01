@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:geesereleif/src/model/customer.dart';
 import 'package:geesereleif/src/provider/provider_customer.dart';
 import 'package:geesereleif/src/util/constraints.dart';
+import 'package:geesereleif/src/util/helper.dart';
 
 // ignore: must_be_immutable
 class CheckIn extends StatefulWidget {
@@ -36,28 +37,35 @@ class _CheckInState extends State<CheckIn> {
                 height: 54,
                 child: FlatButton(
                   onPressed: () async {
-                    if(key.currentState.validate()){
+                    if (key.currentState.validate()) {
                       showDialog(
                           context: context,
                           barrierDismissible: false,
                           builder: (context) => WillPopScope(
-                            onWillPop: () async => false,
-                            child: BackdropFilter(
-                              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
-                              child: AlertDialog(
-                                elevation: 0,
-                                backgroundColor: Colors.transparent,
-                                content: Center(
-                                  child: CircularProgressIndicator(),
+                                onWillPop: () async => false,
+                                child: BackdropFilter(
+                                  filter:
+                                      ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                                  child: AlertDialog(
+                                    elevation: 0,
+                                    backgroundColor: Colors.transparent,
+                                    content: Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ));
-                      bool result = await widget.customerProvider.checkIn(widget.customer.guid, countController.text);
+                              ));
+                      bool result = await widget.customerProvider
+                          .checkIn(widget.customer.guid, countController.text);
                       Navigator.of(context).pop();
                       if (result) {
                         widget.onSave(int.parse(countController.text));
                         Navigator.of(context).pop();
+                        showNetworkResponse(
+                            context: context, message: "Checkin successfully!");
+                      } else {
+                        showNetworkResponseFailed(
+                            context: context, message: "Checkin failed!");
                       }
                     }
                   },
@@ -89,7 +97,7 @@ class _CheckInState extends State<CheckIn> {
                       ),
                       SizedBox(height: 24),
                       TextFormField(
-                        validator: (val){
+                        validator: (val) {
                           return val.isNotEmpty ? null : "* required";
                         },
                         controller: countController,
@@ -97,7 +105,7 @@ class _CheckInState extends State<CheckIn> {
                         cursorColor: textColor,
                         style: getCheckInTextFieldStyle(context),
                         textAlign: TextAlign.center,
-                        onChanged: (val){
+                        onChanged: (val) {
                           key.currentState.validate();
                         },
                         decoration: InputDecoration(

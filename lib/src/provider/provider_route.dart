@@ -1,18 +1,20 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:geesereleif/src/model/route.dart';
 import 'package:geesereleif/src/model/user.dart';
 import 'package:geesereleif/src/util/constraints.dart';
+import 'package:geesereleif/src/util/helper.dart';
+import 'package:geesereleif/src/util/network_helper.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart';
-import 'package:geesereleif/src/model/route.dart';
-import 'package:geesereleif/src/util/network_helper.dart';
 
 class RouteProvider extends ChangeNotifier {
   Map<String, Routes> routes = {};
   bool isLoading = true;
   User user;
   Box<User> userBox;
+  BuildContext context;
 
   init() {
     userBox = Hive.box("users");
@@ -43,10 +45,12 @@ class RouteProvider extends ChangeNotifier {
       } else {
         isLoading = false;
         notifyListeners();
+        showNetworkError(context: context);
       }
     } catch (error) {
       isLoading = false;
       notifyListeners();
+      showNetworkError(context: context);
     }
   }
 
@@ -76,10 +80,12 @@ class RouteProvider extends ChangeNotifier {
       } else {
         isLoading = false;
         notifyListeners();
+        showNetworkError(context: context);
       }
     } catch (error) {
       isLoading = false;
       notifyListeners();
+      showNetworkError(context: context);
     }
   }
 
