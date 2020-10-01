@@ -336,6 +336,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                               Note(
                                 _noteController.text,
                                 DateTime.now().toIso8601String(),
+                                user.name,
                               ),
                             );
                             setState(() {
