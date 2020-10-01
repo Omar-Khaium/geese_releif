@@ -1,7 +1,5 @@
-import 'dart:convert';
-
-import 'package:geesereleif/src/model/note.dart';
 import 'package:geesereleif/src/model/media_file.dart';
+import 'package:geesereleif/src/model/note.dart';
 import 'package:geesereleif/src/util/helper.dart';
 
 class Customer {

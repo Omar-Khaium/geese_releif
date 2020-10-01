@@ -1,10 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:geesereleif/src/model/user.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-User user = User();
 var base64 = const Base64Codec();
 
 final String ultimateDateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS";

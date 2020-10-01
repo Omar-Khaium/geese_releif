@@ -209,6 +209,7 @@ class CustomerProvider extends ChangeNotifier {
       } else {
         alertERROR(context: context, message: "Something went wrong.");
       }
+      return false;
     }
   }
 
@@ -267,9 +268,11 @@ class CustomerProvider extends ChangeNotifier {
         Navigator.of(context).pop();
         showDialog(context: context, builder: (context) => Loading(Colors.green));
         saveImage(context, result["filePath"], customerId, customerProvider);
+        return true;
       } else {
         Navigator.of(context).pop();
         alertERROR(context: context, message: "Failed to upload photo.");
+        return false;
       }
     } catch (error) {
       Navigator.of(context).pop();
@@ -278,6 +281,7 @@ class CustomerProvider extends ChangeNotifier {
       } else {
         alertERROR(context: context, message: "Something went wrong.");
       }
+      return false;
     }
   }
 

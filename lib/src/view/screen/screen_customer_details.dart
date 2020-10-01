@@ -49,7 +49,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
           margin: EdgeInsets.only(bottom: 48),
           child: FloatingActionButton(
             elevation: 4,
-            mini: true,
+            mini: false,
             onPressed: () {
               keyboardProvider.hideKeyboard(context);
               if (_noteController.text.isNotEmpty) {
@@ -336,7 +336,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                               Note(
                                 _noteController.text,
                                 DateTime.now().toIso8601String(),
-                                user.name,
+                                "me",
                               ),
                             );
                             setState(() {

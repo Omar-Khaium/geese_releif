@@ -4,9 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:geesereleif/src/model/customer.dart';
 import 'package:geesereleif/src/provider/provider_customer.dart';
 import 'package:geesereleif/src/util/constraints.dart';
-import 'package:geesereleif/src/util/helper.dart';
 
-// ignore: must_be_immutable
 class CheckIn extends StatefulWidget {
   final Function(int) onSave;
   final Customer customer;
