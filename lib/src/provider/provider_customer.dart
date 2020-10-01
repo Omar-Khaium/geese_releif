@@ -19,104 +19,91 @@ class CustomerProvider extends ChangeNotifier {
   bool isLoading = true;
   User user;
   Box<User> userBox;
-  BuildContext context;
 
   init() {
     userBox = Hive.box("users");
     user = userBox.getAt(0);
   }
 
-  Future<void> getCustomers(String routeId) async {
+  Future<void> getCustomers(String routeId, BuildContext context) async {
     try {
-      if (customers.values
-              .where((element) => element.routeId == routeId)
-              .toList()
-              .length ==
-          0) {
+      if (customers.values.where((element) => element.routeId == routeId).toList().length == 0) {
         isLoading = true;
         notifyListeners();
         Map<String, String> headers = {
           "Authorization": user.token,
           "PageNo": "1",
-          "PageSize": "10",
+          "PageSize": "100",
           "RouteId": routeId,
         };
 
-        Response response =
-            await NetworkHelper.apiGET(api: apiCustomers, headers: headers);
+        Response response = await NetworkHelper.apiGET(api: apiCustomers, headers: headers);
 
         if (response.statusCode == 200) {
-          List<Map<String, dynamic>> result = List<Map<String, dynamic>>.from(
-              json.decode(response.body)['CustomerDetail']);
+          List<Map<String, dynamic>> result = List<Map<String, dynamic>>.from(json.decode(response.body)['CustomerDetail']);
           for (Map<String, dynamic> map in result) {
             Customer customer = Customer.fromJson(
-                map["Customers"],
-                List<Map<String, dynamic>>.from(map["Media"]),
-                List<Map<String, dynamic>>.from(map["Note"]),
-                routeId);
-            if (!customers.containsKey(customer.guid))
-              customers[customer.guid] = customer;
+                map["Customers"], List<Map<String, dynamic>>.from(map["Media"]), List<Map<String, dynamic>>.from(map["Note"]), routeId);
+            if (!customers.containsKey(customer.guid)) customers[customer.guid] = customer;
           }
           isLoading = false;
           notifyListeners();
-          showNetworkResponse(
-              context: context, message: "Customer loaded successfully!");
-          Navigator.pop(context);
         } else {
-          showNetworkError(context: context);
           isLoading = false;
           notifyListeners();
+          alertERROR(context: context, message: "Something went wrong.");
         }
       }
     } catch (error) {
-      showNetworkError(context: context);
       isLoading = false;
       notifyListeners();
+      if (error.toString().contains("SocketException")) {
+        networkERROR(context: context);
+      } else {
+        alertERROR(context: context, message: "Something went wrong.");
+      }
     }
   }
 
-  Future<void> refreshCustomers(String routeId) async {
+  Future<void> refreshCustomers(String routeId, BuildContext context) async {
     isLoading = true;
     notifyListeners();
     try {
       Map<String, String> headers = {
         "Authorization": user.token,
         "PageNo": "1",
-        "PageSize": "10",
+        "PageSize": "100",
         "RouteId": routeId,
       };
 
-      Response response =
-          await NetworkHelper.apiGET(api: apiCustomers, headers: headers);
+      Response response = await NetworkHelper.apiGET(api: apiCustomers, headers: headers);
 
       if (response.statusCode == 200) {
-        List<Map<String, dynamic>> result = List<Map<String, dynamic>>.from(
-            json.decode(response.body)['CustomerDetail']);
+        List<Map<String, dynamic>> result = List<Map<String, dynamic>>.from(json.decode(response.body)['CustomerDetail']);
         for (Map<String, dynamic> map in result) {
           Customer customer = Customer.fromJson(
-              map["Customers"],
-              List<Map<String, dynamic>>.from(map["Media"]),
-              List<Map<String, dynamic>>.from(map["Note"]),
-              routeId);
-          if (!customers.containsKey(customer.guid))
-            customers[customer.guid] = customer;
+              map["Customers"], List<Map<String, dynamic>>.from(map["Media"]), List<Map<String, dynamic>>.from(map["Note"]), routeId);
+          if (!customers.containsKey(customer.guid)) customers[customer.guid] = customer;
         }
         isLoading = false;
         notifyListeners();
       } else {
-        showNetworkError(context: context);
+        alertERROR(context: context, message: "Something went wrong.");
         isLoading = false;
         notifyListeners();
       }
     } catch (error) {
-      showNetworkError(context: context);
       isLoading = false;
       notifyListeners();
+      if (error.toString().contains("SocketException")) {
+        networkERROR(context: context);
+      } else {
+        alertERROR(context: context, message: "Something went wrong.");
+      }
     }
   }
 
-  Future<bool> sendNote(BuildContext context, String routeId, String customerId,
-      String note) async {
+  Future<bool> sendNote(BuildContext context, String routeId, String customerId, String note) async {
     isLoading = true;
     notifyListeners();
     try {
@@ -129,29 +116,35 @@ class CustomerProvider extends ChangeNotifier {
 
       Map<String, String> body = {};
 
-      Response response = await NetworkHelper.apiPOST(
-          api: apiSendNote, headers: headers, body: body);
+      Response response = await NetworkHelper.apiPOST(api: apiSendNote, headers: headers, body: body);
 
       if (response.statusCode == 200) {
-        bool result = json.decode(response.body)['result'];
         isLoading = false;
         notifyListeners();
-        return result;
+        Navigator.of(context).pop();
+        alertSuccess(context: context, message: "Note published successfully.");
+        return true;
       } else {
         isLoading = false;
-        showNetworkError(context: context);
         notifyListeners();
+        Navigator.of(context).pop();
+        alertERROR(context: context, message: "Something went wrong.");
         return false;
       }
     } catch (error) {
       isLoading = false;
-      showNetworkError(context: context);
       notifyListeners();
+      Navigator.of(context).pop();
+      if (error.toString().contains("SocketException")) {
+        networkERROR(context: context);
+      } else {
+        alertERROR(context: context, message: "Something went wrong.");
+      }
       return false;
     }
   }
 
-  Future<bool> checkIn(String customerId, String geeseCount) async {
+  Future<bool> checkIn(BuildContext context, String customerId, String geeseCount) async {
     try {
       Map<String, String> headers = {
         "Authorization": user.token,
@@ -162,20 +155,30 @@ class CustomerProvider extends ChangeNotifier {
 
       Map<String, String> body = {};
 
-      Response response = await NetworkHelper.apiPOST(
-          api: apiCheckIn, headers: headers, body: body);
+      Response response = await NetworkHelper.apiPOST(api: apiCheckIn, headers: headers, body: body);
 
       if (response.statusCode == 200) {
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+        alertSuccess(context: context, message: "Checked in successfully.");
         return json.decode(response.body)['result'] as bool;
       } else {
+        Navigator.of(context).pop();
+        alertERROR(context: context, message: json.decode(response.body)["message"].toString());
         return false;
       }
     } catch (error) {
+      Navigator.of(context).pop();
+      if (error.toString().contains("SocketException")) {
+        networkERROR(context: context);
+      } else {
+        alertERROR(context: context, message: "Something went wrong.");
+      }
       return false;
     }
   }
 
-  Future<bool> checkOut(String customerId) async {
+  Future<bool> checkOut(BuildContext context, String customerId) async {
     try {
       Map<String, String> headers = {
         "Authorization": user.token,
@@ -185,16 +188,24 @@ class CustomerProvider extends ChangeNotifier {
 
       Map<String, String> body = {};
 
-      Response response = await NetworkHelper.apiPOST(
-          api: apiCheckOut, headers: headers, body: body);
+      Response response = await NetworkHelper.apiPOST(api: apiCheckOut, headers: headers, body: body);
 
       if (response.statusCode == 200) {
+        Navigator.of(context).pop();
+        alertSuccess(context: context, message: "Checked out successfully.");
         return json.decode(response.body)['result'] as bool;
       } else {
+        Navigator.of(context).pop();
+        alertERROR(context: context, message: json.decode(response.body)["message"].toString());
         return false;
       }
     } catch (error) {
-      return false;
+      Navigator.of(context).pop();
+      if (error.toString().contains("SocketException")) {
+        networkERROR(context: context);
+      } else {
+        alertERROR(context: context, message: "Something went wrong.");
+      }
     }
   }
 
@@ -211,21 +222,24 @@ class CustomerProvider extends ChangeNotifier {
         "Path": path,
       };
 
-      Response response =
-          await NetworkHelper.apiPOST(api: apiSaveMedia, headers: headers);
+      Response response = await NetworkHelper.apiPOST(api: apiSaveMedia, headers: headers);
 
       if (response.statusCode == 200) {
         customerProvider.newMedia(customerId, apiBaseUrl + path);
         Navigator.of(context).pop();
         Navigator.of(context).pop();
-        showNetworkResponse(context: context, message: "Upload successful!");
+        alertSuccess(context: context, message: "Photo uploaded successfully.");
       } else {
         Navigator.of(context).pop();
-        showNetworkResponseFailed(context: context, message: "Upload failed");
+        alertERROR(context: context, message: "Failed to save photo.");
       }
     } catch (error) {
       Navigator.of(context).pop();
-      showNetworkResponseFailed(context: context, message: "Upload failed");
+      if (error.toString().contains("SocketException")) {
+        networkERROR(context: context);
+      } else {
+        alertERROR(context: context, message: "Something went wrong.");
+      }
     }
   }
 
@@ -245,29 +259,29 @@ class CustomerProvider extends ChangeNotifier {
         "filepath": base64.encode(image.readAsBytesSync()),
       };
 
-      Response response = await NetworkHelper.apiPOST(
-          api: apiUpload, headers: headers, body: body);
+      Response response = await NetworkHelper.apiPOST(api: apiUpload, headers: headers, body: body);
 
       if (response.statusCode == 200) {
         var result = json.decode(response.body);
         Navigator.of(context).pop();
-        showDialog(
-            context: context, builder: (context) => Loading(Colors.green));
+        showDialog(context: context, builder: (context) => Loading(Colors.green));
         saveImage(context, result["filePath"], customerId, customerProvider);
       } else {
         Navigator.of(context).pop();
-        showNetworkResponse(context: context, message: "Upload failed");
+        alertERROR(context: context, message: "Failed to upload photo.");
       }
     } catch (error) {
       Navigator.of(context).pop();
-      showNetworkResponse(context: context, message: "Something went wrong!");
+      if (error.toString().contains("SocketException")) {
+        networkERROR(context: context);
+      } else {
+        alertERROR(context: context, message: "Something went wrong.");
+      }
     }
   }
 
   List<Customer> customerList(String routeId) {
-    List<Customer> list = customers.values
-        .where((element) => element.routeId == routeId)
-        .toList();
+    List<Customer> list = customers.values.where((element) => element.routeId == routeId).toList();
     return list;
   }
 

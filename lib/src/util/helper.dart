@@ -43,85 +43,8 @@ int doesHistoryExists(List<History> histories, History history) {
   return -1;
 }
 
-void showNetworkResponse(
-    {@required BuildContext context, @required String message}) {
-  Flushbar(
-    flushbarPosition: FlushbarPosition.TOP,
-    flushbarStyle: FlushbarStyle.GROUNDED,
-    backgroundColor: Colors.greenAccent.shade700,
-    duration: Duration(seconds: 4),
-    boxShadows: [
-      BoxShadow(
-        color: Colors.green.shade200,
-        offset: Offset(0.0, 0.0),
-        blurRadius: 1.0,
-      )
-    ],
-    title: "Congratulations",
-    message: message,
-  )..show(context);
-}
-
-void showNetworkResponseFailed(
-    {@required BuildContext context, @required String message}) {
-  Flushbar(
-    flushbarPosition: FlushbarPosition.TOP,
-    flushbarStyle: FlushbarStyle.GROUNDED,
-    backgroundColor: Colors.greenAccent.shade700,
-    duration: Duration(seconds: 4),
-    boxShadows: [
-      BoxShadow(
-        color: Colors.red.shade100,
-        offset: Offset(0.0, 0.0),
-        blurRadius: 1.0,
-      )
-    ],
-    title: "Congratulations",
-    message: message,
-  )..show(context);
-}
-
-void showNetworkError({@required BuildContext context, String message}) {
-  Flushbar(
-    flushbarPosition: FlushbarPosition.TOP,
-    flushbarStyle: FlushbarStyle.GROUNDED,
-    backgroundColor: Colors.red.shade400,
-    duration: Duration(seconds: 4),
-    boxShadows: [
-      BoxShadow(
-        color: Colors.red.shade200,
-        offset: Offset(0.0, 0.0),
-        blurRadius: 1.0,
-      )
-    ],
-    title: "Something Went Wrong",
-    message: message == null
-        ? "Please Try Again Later"
-        : message == null ? "Network Error" : message,
-  )..show(context);
-}
-
-void showRuntimeError(
-    {@required BuildContext context, @required String message}) {
-  Flushbar(
-    flushbarPosition: FlushbarPosition.TOP,
-    flushbarStyle: FlushbarStyle.GROUNDED,
-    backgroundColor: Colors.redAccent.shade200,
-    duration: Duration(seconds: 4),
-    boxShadows: [
-      BoxShadow(
-        color: Colors.red.shade100,
-        offset: Offset(0.0, 0.0),
-        blurRadius: 1.0,
-      )
-    ],
-    title: "Something Went Wrong",
-    message: message,
-  )..show(context);
-}
-
 DateTime stringToDateTime(String date) {
-  DateTime dateTime = DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").parse(date);
+  DateTime dateTime = DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").parse(date.contains(".") ? date : "$date.000");
   return dateTime;
 }
 
@@ -194,11 +117,11 @@ String refineString(String value) {
   return value ?? "";
 }
 
-void alertERROR({@required BuildContext context, @required String message}) {
+void networkERROR({@required BuildContext context}) {
   Flushbar(
     flushbarPosition: FlushbarPosition.TOP,
     flushbarStyle: FlushbarStyle.GROUNDED,
-    backgroundColor: Colors.redAccent.shade200,
+    backgroundColor: Colors.red.shade400,
     duration: Duration(seconds: 4),
     boxShadows: [
       BoxShadow(
@@ -207,7 +130,25 @@ void alertERROR({@required BuildContext context, @required String message}) {
         blurRadius: 1.0,
       )
     ],
-    title: "Something Went Wrong",
+    title: "No Internet Connection",
+    message: "Please connect to an active network",
+  )..show(context);
+}
+
+void alertERROR({@required BuildContext context, @required String message}) {
+  Flushbar(
+    flushbarPosition: FlushbarPosition.TOP,
+    flushbarStyle: FlushbarStyle.GROUNDED,
+    backgroundColor: Colors.red.shade300,
+    duration: Duration(seconds: 4),
+    boxShadows: [
+      BoxShadow(
+        color: Colors.red.shade100,
+        offset: Offset(0.0, 0.0),
+        blurRadius: 1.0,
+      )
+    ],
+    title: "Error",
     message: message,
   )..show(context);
 }
@@ -216,11 +157,11 @@ void alertSuccess({@required BuildContext context, @required String message}) {
   Flushbar(
     flushbarPosition: FlushbarPosition.TOP,
     flushbarStyle: FlushbarStyle.GROUNDED,
-    backgroundColor: Colors.greenAccent.shade700,
+    backgroundColor: Colors.blue,
     duration: Duration(seconds: 4),
     boxShadows: [
       BoxShadow(
-        color: Colors.green.shade100,
+        color: Colors.blue.shade100,
         offset: Offset(0.0, 0.0),
         blurRadius: 1.0,
       )

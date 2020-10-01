@@ -14,14 +14,13 @@ class RouteProvider extends ChangeNotifier {
   bool isLoading = true;
   User user;
   Box<User> userBox;
-  BuildContext context;
 
   init() {
     userBox = Hive.box("users");
     user = userBox.getAt(0);
   }
 
-  Future<void> getRoutes() async {
+  Future<void> getRoutes(BuildContext context) async {
     try {
       Map<String, String> headers = {
         "Authorization": user.token,
@@ -45,16 +44,20 @@ class RouteProvider extends ChangeNotifier {
       } else {
         isLoading = false;
         notifyListeners();
-        showNetworkError(context: context);
+        alertERROR(context: context, message: "Something went wrong.");
       }
     } catch (error) {
       isLoading = false;
       notifyListeners();
-      showNetworkError(context: context);
+      if(error.toString().contains("SocketException")){
+        networkERROR(context: context);
+      } else {
+        alertERROR(context: context, message: "Something went wrong.");
+      }
     }
   }
 
-  Future<void> refreshRoutes() async {
+  Future<void> refreshRoutes(BuildContext context) async {
     isLoading = true;
     notifyListeners();
     try {
@@ -62,7 +65,7 @@ class RouteProvider extends ChangeNotifier {
         "Authorization": user.token,
         "UserId": user.guid,
         "PageNo": "1",
-        "PageSize": "10",
+        "PageSize": "100",
       };
 
       Response response =
@@ -80,12 +83,16 @@ class RouteProvider extends ChangeNotifier {
       } else {
         isLoading = false;
         notifyListeners();
-        showNetworkError(context: context);
+        alertERROR(context: context, message: "Something went wrong.");
       }
     } catch (error) {
       isLoading = false;
       notifyListeners();
-      showNetworkError(context: context);
+      if(error.toString().contains("SocketException")){
+        networkERROR(context: context);
+      } else {
+        alertERROR(context: context, message: "Something went wrong.");
+      }
     }
   }
 

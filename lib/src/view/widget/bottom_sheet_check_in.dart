@@ -11,6 +11,7 @@ class CheckIn extends StatefulWidget {
   final Function(int) onSave;
   final Customer customer;
   final CustomerProvider customerProvider;
+
   CheckIn(this.customer, this.customerProvider, {@required this.onSave});
 
   @override
@@ -44,8 +45,7 @@ class _CheckInState extends State<CheckIn> {
                           builder: (context) => WillPopScope(
                                 onWillPop: () async => false,
                                 child: BackdropFilter(
-                                  filter:
-                                      ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                                  filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
                                   child: AlertDialog(
                                     elevation: 0,
                                     backgroundColor: Colors.transparent,
@@ -55,17 +55,9 @@ class _CheckInState extends State<CheckIn> {
                                   ),
                                 ),
                               ));
-                      bool result = await widget.customerProvider
-                          .checkIn(widget.customer.guid, countController.text);
-                      Navigator.of(context).pop();
+                      bool result = await widget.customerProvider.checkIn(context, widget.customer.guid, countController.text);
                       if (result) {
                         widget.onSave(int.parse(countController.text));
-                        Navigator.of(context).pop();
-                        showNetworkResponse(
-                            context: context, message: "Checkin successfully!");
-                      } else {
-                        showNetworkResponseFailed(
-                            context: context, message: "Checkin failed!");
                       }
                     }
                   },
@@ -111,18 +103,15 @@ class _CheckInState extends State<CheckIn> {
                         decoration: InputDecoration(
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(0),
-                              borderSide:
-                                  BorderSide(color: accentColor, width: 1),
+                              borderSide: BorderSide(color: accentColor, width: 1),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(0),
-                              borderSide:
-                                  BorderSide(color: accentColor, width: 3),
+                              borderSide: BorderSide(color: accentColor, width: 3),
                             ),
                             errorBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(0),
-                              borderSide:
-                                  BorderSide(color: Colors.red, width: 3),
+                              borderSide: BorderSide(color: Colors.red, width: 3),
                             ),
                             hintText: "* how many geese do you see?",
                             hintStyle: getHintTextStyle(context),

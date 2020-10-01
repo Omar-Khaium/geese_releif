@@ -19,7 +19,7 @@ class RoutesScreen extends StatelessWidget {
     Future.delayed(Duration(milliseconds: 1), () {
       if (routeProvider.routeList.length == 0) {
         routeProvider.init();
-        routeProvider.getRoutes();
+        routeProvider.getRoutes(context);
       }
     });
 
@@ -75,7 +75,7 @@ class RoutesScreen extends StatelessWidget {
           ? ShimmerRoute()
           : routeProvider.routeList.length == 0
               ? RefreshIndicator(
-                  onRefresh: () => routeProvider.refreshRoutes(),
+                  onRefresh: () => routeProvider.refreshRoutes(context),
                   child: Container(
                     width: MediaQuery.of(context).size.width,
                     height: MediaQuery.of(context).size.height -
@@ -102,7 +102,7 @@ class RoutesScreen extends StatelessWidget {
                   ),
                 )
               : RefreshIndicator(
-                  onRefresh: () => routeProvider.refreshRoutes(),
+                  onRefresh: () => routeProvider.refreshRoutes(context),
                   child: ListView.separated(
                     shrinkWrap: false,
                     scrollDirection: Axis.vertical,

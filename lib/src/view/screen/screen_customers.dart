@@ -21,7 +21,7 @@ class CustomersScreen extends StatelessWidget {
     Future.delayed(Duration(milliseconds: 1), () {
       customerProvider.init();
       if (customerProvider.customerList(routeId).length == 0) {
-        customerProvider.getCustomers(routeId);
+        customerProvider.getCustomers(routeId,context);
       }
     });
     return Scaffold(
@@ -74,7 +74,7 @@ class CustomersScreen extends StatelessWidget {
           ? ShimmerCustomer()
           : customerProvider.customerList(routeId).length == 0
               ? RefreshIndicator(
-                  onRefresh: () => customerProvider.refreshCustomers(routeId),
+                  onRefresh: () => customerProvider.refreshCustomers(routeId,context),
                   child: Container(
                     width: MediaQuery.of(context).size.width,
                     height: MediaQuery.of(context).size.height -
@@ -101,7 +101,7 @@ class CustomersScreen extends StatelessWidget {
                   ),
                 )
               : RefreshIndicator(
-                  onRefresh: () => customerProvider.refreshCustomers(routeId),
+                  onRefresh: () => customerProvider.refreshCustomers(routeId,context),
                   child: ListView.separated(
                     shrinkWrap: false,
                     scrollDirection: Axis.vertical,

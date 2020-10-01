@@ -186,33 +186,27 @@ class _LoginFormState extends State<LoginForm> {
         user.isAuthenticated = true;
         user.token = "${result["token_type"]} ${result["access_token"]} ";
         Navigator.of(context).pop();
-        /*showDialog(
-            context: context, builder: (context) => Loading(Colors.green));*/
-
-        showNetworkResponse(context: context, message: "Login Successful");
+        showDialog(context: context, builder: (context) => Loading(Colors.green));
         getProfileData();
       } else if (response.statusCode == 500) {
         Navigator.of(context).pop();
-        showNetworkError(context: context);
+        alertERROR(context: context, message: "Username name is incorrect.");
       } else if (response.statusCode == 400) {
         Navigator.of(context).pop();
-        showNetworkError(context: context, message: "Wrong Credentials");
+        alertERROR(context: context, message: "Password name is incorrect.");
       } else {
         user.isAuthenticated = false;
         Navigator.of(context).pop();
-        showNetworkError(context: context);
+        alertERROR(context: context, message: "Something went wrong.");
       }
     } catch (error) {
       user.isAuthenticated = false;
-      /*StatusAlert.show(
-        context,
-        duration: Duration(milliseconds: 100),
-        title: 'Authentication Failed',
-        subtitle: 'something went wrong',
-        configuration: IconConfiguration(icon: Icons.lock),
-      );*/
       Navigator.of(context).pop();
-      showNetworkError(context: context);
+      if(error.toString().contains("SocketException")){
+        networkERROR(context: context);
+      } else {
+        alertERROR(context: context, message: "Something went wrong.");
+      }
     }
   }
 
@@ -238,25 +232,16 @@ class _LoginFormState extends State<LoginForm> {
         Navigator.of(context).pop();
         Navigator.of(context).pushReplacementNamed(RoutesScreen().routeName);
       } else {
-        /*StatusAlert.show(
-          context,
-          duration: Duration(milliseconds: 500),
-          title: 'Profile Fetching Failed',
-          subtitle: "internal server error",
-          configuration: IconConfiguration(icon: Icons.person_outline),
-        );*/
         Navigator.of(context).pop();
+        alertERROR(context: context, message: "Can't fetch user's information.");
       }
     } catch (error) {
-      showNetworkError(context: context);
-      /*StatusAlert.show(
-        context,
-        duration: Duration(milliseconds: 500),
-        title: 'Profile Fetching Failed',
-        subtitle: "something went wrong",
-        configuration: IconConfiguration(icon: Icons.person_outline),
-      );*/
       Navigator.of(context).pop();
+      if(error.toString().contains("SocketException")){
+        networkERROR(context: context);
+      } else {
+        alertERROR(context: context, message: "Something went wrong.");
+      }
     }
   }
 }

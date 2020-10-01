@@ -35,10 +35,7 @@ class Customer {
       this.noteList});
 
   Customer.fromJson(
-      Map<String, dynamic> customer,
-      List<Map<String, dynamic>> mediaJson,
-      List<Map<String, dynamic>> noteJson,
-      String routeId) {
+      Map<String, dynamic> customer, List<Map<String, dynamic>> mediaJson, List<Map<String, dynamic>> noteJson, String routeId) {
     try {
       guid = customer["CustomerId"];
       this.routeId = routeId;
@@ -54,6 +51,8 @@ class Customer {
       geeseCount = customer["GeeseCount"];
       isCheckedIn = customer["IsCheckedIn"];
 
+      noteList = [];
+      mediaList = [];
       noteJson.forEach((element) {
         noteList.add(Note.fromJson(Map<String, dynamic>.from(element)));
       });
