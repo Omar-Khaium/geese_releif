@@ -21,7 +21,7 @@ class LoginScreen extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Visibility(
-                    visible: !keyboardProvider.isKeyboardVisible,
+                    visible: keyboardProvider.isKeyboardHidden,
                     child: Image.asset(
                       "images/logo.png",
                       width: 144,

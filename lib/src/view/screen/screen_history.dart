@@ -36,37 +36,6 @@ class HistoryScreen extends StatelessWidget {
           "History",
           style: getAppBarTextStyle(context),
         ),
-        // bottom: PreferredSize(
-        //   child: Container(
-        //     width: MediaQuery.of(context).size.width,
-        //     height: 36,
-        //     alignment: Alignment.centerLeft,
-        //     padding: const EdgeInsets.symmetric(horizontal: 16),
-        //     margin: const EdgeInsets.symmetric(horizontal: 16),
-        //     decoration: BoxDecoration(
-        //         color: Colors.grey.shade100,
-        //         borderRadius: BorderRadius.circular(32)),
-        //     child: Row(
-        //       mainAxisSize: MainAxisSize.min,
-        //       children: [
-        //         Icon(
-        //           FontAwesomeIcons.filter,
-        //           size: 12,
-        //           color: hintColor,
-        //         ),
-        //         SizedBox(
-        //           width: 16,
-        //         ),
-        //         Text(
-        //           "Last 24 Hours",
-        //           style: getDefaultTextStyle(context),
-        //           overflow: TextOverflow.ellipsis,
-        //         ),
-        //       ],
-        //     ),
-        //   ),
-        //   preferredSize: const Size.fromHeight(36),
-        // ),
         actions: [
           IconButton(
             onPressed: () {

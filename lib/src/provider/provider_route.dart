@@ -22,6 +22,7 @@ class RouteProvider extends ChangeNotifier {
 
   Future<void> getRoutes(BuildContext context) async {
     try {
+      routes = {};
       Map<String, String> headers = {
         "Authorization": user.token,
         "UserId": user.guid,

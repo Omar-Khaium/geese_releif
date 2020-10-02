@@ -72,7 +72,10 @@ String dateTimeToFriendlyDate(DateTime date, String pattern) {
 String dateTimeToFriendlyTime(DateTime date, String pattern) {
   try {
     int diff = DateTime.now().difference(date).inMinutes;
-    if (diff <= 60) {
+    if (diff < 0) {
+      return "0m ago";
+    }
+    else if (diff >=0 && diff <= 60) {
       return "${diff}m ago";
     } else if (diff <= 24 * 60) {
       return "${diff ~/ 60}h ago";

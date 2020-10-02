@@ -36,27 +36,24 @@ class RoutesScreen extends StatelessWidget {
           style: getAppBarTextStyle(context),
         ),
         actions: [
-          Visibility(
-            visible: false,
-            child: ActionChip(
-              onPressed: () {
-                Navigator.of(context).pushNamed(HistoryScreen().routeName);
-              },
-              label: Visibility(
-                child: Text(
-                  "History",
-                  style: getDefaultTextStyle(context),
-                ),
+          ActionChip(
+            onPressed: () {
+              Navigator.of(context).pushNamed(HistoryScreen().routeName);
+            },
+            label: Visibility(
+              child: Text(
+                "History",
+                style: getDefaultTextStyle(context),
               ),
-              labelPadding: const EdgeInsets.only(right: 4),
-              avatar: Icon(
-                FontAwesomeIcons.history,
-                size: 14,
-                color: Colors.grey.shade700,
-              ),
-              backgroundColor: Colors.grey.shade200,
-              elevation: 0,
             ),
+            labelPadding: const EdgeInsets.only(right: 4),
+            avatar: Icon(
+              FontAwesomeIcons.history,
+              size: 14,
+              color: Colors.grey.shade700,
+            ),
+            backgroundColor: Colors.grey.shade200,
+            elevation: 0,
           ),
           IconButton(
             onPressed: () {

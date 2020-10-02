@@ -26,13 +26,13 @@ class PhotoPreview extends StatelessWidget {
               physics: ScrollPhysics(),
               children: files
                   .map(
-                    (e) => InkWell(
+                    (file) => InkWell(
                       splashColor: Colors.transparent,
                       highlightColor: Colors.transparent,
                       onTap: () {
                         Navigator.of(context).pushNamed(
                             ViewPhotoScreen().routeName,
-                            arguments: e.url);
+                            arguments: file);
                       },
                       child: Container(
                         decoration: BoxDecoration(boxShadow: [
@@ -41,9 +41,9 @@ class PhotoPreview extends StatelessWidget {
                         ]),
                         margin: EdgeInsets.all(2),
                         child: Hero(
-                          tag: e.url,
+                          tag: file.url,
                           child: CachedNetworkImage(
-                            imageUrl: e.url,
+                            imageUrl: file.url,
                             imageBuilder: (context, imageProvider) => Container(
                               decoration: BoxDecoration(
                                 image: DecorationImage(

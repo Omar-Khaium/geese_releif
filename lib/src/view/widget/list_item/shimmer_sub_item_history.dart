@@ -51,7 +51,7 @@ class ShimmerHistorySubItem extends StatelessWidget {
                     child: Visibility(
                       visible: !isLastItem,
                       child: VerticalDivider(
-                        color: textColor,
+                        color: Colors.grey.shade100,
                       ),
                     ),
                   ),

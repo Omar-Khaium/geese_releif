@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geesereleif/src/model/history_item.dart';
-import 'package:geesereleif/src/view/screen/screen_customer_details.dart';
 import 'package:geesereleif/src/util/constraints.dart';
 import 'package:geesereleif/src/util/helper.dart';
 
@@ -17,7 +16,7 @@ class HistorySubItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
-      height: 80,
+      height: constructAddress(historyItem.customer.street, historyItem.customer.city, historyItem.customer.state, historyItem.customer.zip).isNotEmpty ? 84 : 64,
       child: Row(
         mainAxisSize: MainAxisSize.max,
         children: [
@@ -32,25 +31,18 @@ class HistorySubItem extends StatelessWidget {
                   children: [
                     Transform.rotate(
                       child: Icon(
-                        historyItem.logType == LogType.Active
-                            ? Icons.fiber_manual_record
-                            : Icons.transit_enterexit,
-                        color: historyItem.logType == LogType.Active ||
-                                historyItem.logType == LogType.CheckedIn
+                        historyItem.logType == LogType.Active ? Icons.fiber_manual_record : Icons.transit_enterexit,
+                        color: historyItem.logType == LogType.Active || historyItem.logType == LogType.CheckedIn
                             ? Colors.green
                             : Colors.red,
                       ),
-                      angle: historyItem.logType == LogType.CheckedIn
-                          ? -pi / 2
-                          : -pi,
+                      angle: historyItem.logType == LogType.CheckedIn ? -pi / 2 : -pi,
                     ),
                     SizedBox(
                       width: 2,
                     ),
                     Text(
-                      dateTimeToStringTime(
-                              stringToDateTime(historyItem.time), "hh:mm a") ??
-                          "-",
+                      dateTimeToStringTime(stringToDateTime(historyItem.time), "hh:mm a") ?? "-",
                       style: getCaptionTextStyle(context),
                     ),
                   ],
@@ -70,51 +62,51 @@ class HistorySubItem extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: InkWell(
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-              onTap: () => Navigator.of(context).pushNamed(
-                  CustomerDetailsScreen().routeName,
-                  arguments: historyItem.customer.guid),
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    borderRadius: BorderRadius.circular(12)),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                margin: const EdgeInsets.only(bottom: 6),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          FontAwesomeIcons.solidUser,
-                          size: 12,
-                          color: textColor,
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(12)),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              margin: const EdgeInsets.only(bottom: 6),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        FontAwesomeIcons.solidUser,
+                        size: 12,
+                        color: textColor,
+                      ),
+                      SizedBox(
+                        width: 12,
+                      ),
+                      SizedBox(
+                        child: Text(
+                          historyItem.customer.name ?? "-",
+                          style: getDefaultTextStyle(context, isFocused: false),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        SizedBox(
-                          width: 12,
-                        ),
-                        SizedBox(
-                          child: Text(
-                            historyItem.customer.name ?? "-",
-                            style:
-                                getDefaultTextStyle(context, isFocused: false),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          width: MediaQuery.of(context).size.width * .7 - 72,
-                        ),
-                      ],
-                    ),
-                    SizedBox(
+                        width: MediaQuery.of(context).size.width * .7 - 72,
+                      ),
+                    ],
+                  ),
+                  Visibility(
+                    visible: constructAddress(historyItem.customer.street, historyItem.customer.city, historyItem.customer.state,
+                            historyItem.customer.zip)
+                        .isNotEmpty,
+                    child: SizedBox(
                       height: 8,
                     ),
-                    Row(
+                  ),
+                  Visibility(
+                    visible: constructAddress(historyItem.customer.street, historyItem.customer.city, historyItem.customer.state,
+                            historyItem.customer.zip)
+                        .isNotEmpty,
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
@@ -127,7 +119,8 @@ class HistorySubItem extends StatelessWidget {
                         ),
                         SizedBox(
                           child: Text(
-                            "${historyItem.customer.street}\n${historyItem.customer.city}, ${historyItem.customer.state} ${historyItem.customer.zip}",
+                            constructAddress(historyItem.customer.street, historyItem.customer.city, historyItem.customer.state,
+                                historyItem.customer.zip),
                             style: getCaptionTextStyle(context),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -135,11 +128,11 @@ class HistorySubItem extends StatelessWidget {
                         ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );

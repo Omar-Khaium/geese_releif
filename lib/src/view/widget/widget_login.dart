@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:geesereleif/src/model/user.dart';
 import 'package:geesereleif/src/provider/provider_customer.dart';
 import 'package:geesereleif/src/provider/provider_history.dart';
+import 'package:geesereleif/src/provider/provider_keyboard.dart';
 import 'package:geesereleif/src/provider/provider_route.dart';
 import 'package:geesereleif/src/util/constraints.dart';
 import 'package:geesereleif/src/util/helper.dart';
@@ -20,10 +21,8 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<LoginForm> {
-  TextEditingController _usernameController =
-      TextEditingController(); //text: "administrator"
-  TextEditingController _passwordController =
-      TextEditingController(); //text: "@AadGjMpTw9!"
+  TextEditingController _usernameController = TextEditingController(); //text: "administrator"
+  TextEditingController _passwordController = TextEditingController(); //text: "@AadGjMpTw9!"
   bool _isObscure = true;
   bool _isRemembered = false;
   User user;
@@ -35,10 +34,8 @@ class _LoginFormState extends State<LoginForm> {
   void initState() {
     userBox = Hive.box("users");
     user = userBox.length > 0 ? userBox.getAt(0) : User();
-    _usernameController.text =
-        user.isRemembered ?? false ? user.email ?? "" : "";
-    _passwordController.text =
-        user.isRemembered ?? false ? user.password ?? "" : "";
+    _usernameController.text = user.isRemembered ?? false ? user.email ?? "" : "";
+    _passwordController.text = user.isRemembered ?? false ? user.password ?? "" : "";
     _isRemembered = user.isRemembered ?? false;
     super.initState();
   }
@@ -46,10 +43,8 @@ class _LoginFormState extends State<LoginForm> {
   @override
   Widget build(BuildContext context) {
     final routeProvider = Provider.of<RouteProvider>(context, listen: false);
-    final customerProvider =
-        Provider.of<CustomerProvider>(context, listen: false);
-    final historyProvider =
-        Provider.of<HistoryProvider>(context, listen: false);
+    final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
+    final historyProvider = Provider.of<HistoryProvider>(context, listen: false);
     Future.delayed(Duration(milliseconds: 0), () {
       routeProvider.clear();
       customerProvider.clear();
@@ -110,8 +105,7 @@ class _LoginFormState extends State<LoginForm> {
                       _isObscure = !_isObscure;
                     });
                   },
-                  icon: Icon(
-                      _isObscure ? Icons.visibility : Icons.visibility_off),
+                  icon: Icon(_isObscure ? Icons.visibility : Icons.visibility_off),
                 ),
                 hintText: "Password",
                 hintStyle: getHintTextStyle(context),
@@ -138,8 +132,7 @@ class _LoginFormState extends State<LoginForm> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: OutlineButton(
               borderSide: BorderSide(color: accentColor, width: 4),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(0)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
               splashColor: Colors.blue,
               highlightColor: Colors.white,
               color: backgroundColor,
@@ -156,9 +149,7 @@ class _LoginFormState extends State<LoginForm> {
                   user.email = _usernameController.text;
                   user.password = _passwordController.text;
                   FocusScope.of(context).requestFocus(FocusNode());
-                  showDialog(
-                      context: context,
-                      builder: (context) => Loading(Colors.blue));
+                  showDialog(context: context, builder: (context) => Loading(Colors.blue));
                   login();
                 }
               },
@@ -178,8 +169,7 @@ class _LoginFormState extends State<LoginForm> {
         "grant_type": "password",
       };
 
-      Response response = await NetworkHelper.apiPOST(
-          api: apiToken, headers: headers, body: body);
+      Response response = await NetworkHelper.apiPOST(api: apiToken, headers: headers, body: body);
 
       if (response.statusCode == 200) {
         Map<String, dynamic> result = json.decode(response.body);
@@ -202,7 +192,7 @@ class _LoginFormState extends State<LoginForm> {
     } catch (error) {
       user.isAuthenticated = false;
       Navigator.of(context).pop();
-      if(error.toString().contains("SocketException")){
+      if (error.toString().contains("SocketException")) {
         networkERROR(context: context);
       } else {
         alertERROR(context: context, message: "Something went wrong.");
@@ -217,8 +207,7 @@ class _LoginFormState extends State<LoginForm> {
         "username": user.email,
       };
 
-      Response response =
-          await NetworkHelper.apiGET(api: apiUserInfo, headers: headers);
+      Response response = await NetworkHelper.apiGET(api: apiUserInfo, headers: headers);
 
       if (response.statusCode == 200) {
         Map<String, dynamic> result = json.decode(response.body);
@@ -237,7 +226,7 @@ class _LoginFormState extends State<LoginForm> {
       }
     } catch (error) {
       Navigator.of(context).pop();
-      if(error.toString().contains("SocketException")){
+      if (error.toString().contains("SocketException")) {
         networkERROR(context: context);
       } else {
         alertERROR(context: context, message: "Something went wrong.");

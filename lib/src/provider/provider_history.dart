@@ -46,6 +46,7 @@ class HistoryProvider extends ChangeNotifier {
 
   Future<void> getHistory(CustomerProvider customerProvider) async {
     try {
+      items = {};
       Map<String, String> headers = {
         "Authorization": user.token,
         "UserId": user.guid,

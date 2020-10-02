@@ -210,42 +210,48 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                 shrinkWrap: true,
                 physics: ScrollPhysics(),
                 children: [
-                  ListTile(
-                    onTap: () {
-                      if (customer.phone.isNotEmpty) launch("tel:${customer.phone}");
-                    },
-                    leading: Icon(
-                      FontAwesomeIcons.phoneAlt,
-                      color: textColor,
-                      size: 18,
-                    ),
-                    title: Text(
-                      customer.phone.isEmpty ? "no number" : customer.phone ?? "-",
-                      style: customer.phone.isEmpty ? getHintTextStyle(context) : getDefaultTextStyle(context),
-                    ),
-                    dense: true,
-                  ),
-                  ListTile(
+                  Visibility(
+                    visible: customer.phone.isNotEmpty,
+                    child: ListTile(
                       onTap: () {
-                        if (constructAddress(customer.street, customer.city, customer.state, customer.zip).isNotEmpty) {
-                          MapsLauncher.launchQuery(
-                            constructAddress(customer.street, customer.city, customer.state, customer.zip),
-                          );
-                        }
+                        if (customer.phone.isNotEmpty) launch("tel:${customer.phone}");
                       },
                       leading: Icon(
-                        FontAwesomeIcons.mapMarkerAlt,
+                        FontAwesomeIcons.phoneAlt,
                         color: textColor,
                         size: 18,
                       ),
                       title: Text(
-                        constructAddress(customer.street, customer.city, customer.state, customer.zip).isEmpty
-                            ? "no address"
-                            : constructAddress(customer.street, customer.city, customer.state, customer.zip),
-                        style: constructAddress(customer.street, customer.city, customer.state, customer.zip).isEmpty
-                            ? getHintTextStyle(context)
-                            : getDefaultTextStyle(context),
-                      )),
+                        customer.phone.isEmpty ? "no number" : customer.phone ?? "-",
+                        style: customer.phone.isEmpty ? getHintTextStyle(context) : getDefaultTextStyle(context),
+                      ),
+                      dense: true,
+                    ),
+                  ),
+                  Visibility(
+                    visible: constructAddress(customer.street, customer.city, customer.state, customer.zip).isNotEmpty,
+                    child: ListTile(
+                        onTap: () {
+                          if (constructAddress(customer.street, customer.city, customer.state, customer.zip).isNotEmpty) {
+                            MapsLauncher.launchQuery(
+                              constructAddress(customer.street, customer.city, customer.state, customer.zip),
+                            );
+                          }
+                        },
+                        leading: Icon(
+                          FontAwesomeIcons.mapMarkerAlt,
+                          color: textColor,
+                          size: 18,
+                        ),
+                        title: Text(
+                          constructAddress(customer.street, customer.city, customer.state, customer.zip).isEmpty
+                              ? "no address"
+                              : constructAddress(customer.street, customer.city, customer.state, customer.zip),
+                          style: constructAddress(customer.street, customer.city, customer.state, customer.zip).isEmpty
+                              ? getHintTextStyle(context)
+                              : getDefaultTextStyle(context),
+                        )),
+                  ),
                   ListTile(
                     leading: Icon(
                       FontAwesomeIcons.solidCalendarAlt,

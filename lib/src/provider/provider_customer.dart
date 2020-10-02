@@ -27,6 +27,7 @@ class CustomerProvider extends ChangeNotifier {
 
   Future<void> getCustomers(String routeId, BuildContext context) async {
     try {
+      customers = {};
       if (customers.values
           .where((element) => element.routeId == routeId)
           .toList()
@@ -215,19 +216,21 @@ class CustomerProvider extends ChangeNotifier {
 
   Future<void> saveImage(BuildContext context,
       String path,
+      String note,
       String customerId,
       CustomerProvider customerProvider,) async {
     try {
       Map<String, String> headers = {
         "Authorization": user.token,
         "CustomerId": customerId,
-        "Path": path,
+        "Path": path.toString(),
+        "Note": note.replaceAll("\n", "</br>").replaceAll("\r", ""),
       };
 
       Response response = await NetworkHelper.apiPOST(api: apiSaveMedia, headers: headers);
 
       if (response.statusCode == 200) {
-        customerProvider.newMedia(customerId, apiBaseUrl + path);
+        customerProvider.newMedia(customerId, apiBaseUrl + path, note);
         Navigator.of(context).pop();
         Navigator.of(context).pop();
         alertSuccess(context: context, message: "Photo uploaded successfully.");
@@ -247,6 +250,7 @@ class CustomerProvider extends ChangeNotifier {
 
   Future<bool> uploadImage(BuildContext context,
       File image,
+      String note,
       String customerId,
       CustomerProvider customerProvider,) async {
     try {
@@ -267,7 +271,7 @@ class CustomerProvider extends ChangeNotifier {
         var result = json.decode(response.body);
         Navigator.of(context).pop();
         showDialog(context: context, builder: (context) => Loading(Colors.green));
-        saveImage(context, result["filePath"], customerId, customerProvider);
+        saveImage(context, result["filePath"], note, customerId, customerProvider);
         return true;
       } else {
         Navigator.of(context).pop();
@@ -302,10 +306,10 @@ class CustomerProvider extends ChangeNotifier {
     return customers.values.firstWhere((element) => element.guid == id);
   }
 
-  void newMedia(String customerId, String path) {
+  void newMedia(String customerId, String path, String note) {
     Customer customer = findCustomerByID(customerId);
     customer.mediaList.add(
-      MediaFile(path, DateTime.now().toIso8601String()),
+      MediaFile(path, DateTime.now().toIso8601String(), "me", note),
     );
     notifyListeners();
   }
