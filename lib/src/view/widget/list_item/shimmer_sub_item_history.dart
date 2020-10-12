@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:geesereleif/src/util/constraints.dart';
 
 class ShimmerHistorySubItem extends StatelessWidget {
   final bool isLastItem;

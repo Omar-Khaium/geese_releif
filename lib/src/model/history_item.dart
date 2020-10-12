@@ -1,10 +1,13 @@
-import 'package:geesereleif/src/model/customer.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:geesereleif/src/util/constraints.dart';
 
 class HistoryItem {
   String time;
   LogType logType;
-  Customer customer;
+  String customerGuid;
+  String checkedBy;
+  int geeseCount;
 
-  HistoryItem({this.time, this.logType, this.customer});
+  HistoryItem(
+      {@required this.time, @required this.logType, @required this.customerGuid, @required this.checkedBy, @required this.geeseCount});
 }

@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geesereleif/src/model/customer.dart';
 import 'package:geesereleif/src/provider/provider_customer.dart';
+import 'package:geesereleif/src/provider/provider_history.dart';
+import 'package:geesereleif/src/provider/provider_route.dart';
 import 'package:geesereleif/src/util/constraints.dart';
-import 'package:geesereleif/src/view/screen/screen_history.dart';
 import 'package:geesereleif/src/view/screen/screen_login.dart';
 import 'package:geesereleif/src/view/widget/list_item/item_customer.dart';
 import 'package:geesereleif/src/view/widget/shimmer/shimmer_customer.dart';
@@ -15,15 +16,21 @@ class CustomersScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final customerProvider = Provider.of<CustomerProvider>(context);
+    final routeProvider = Provider.of<RouteProvider>(context, listen: false);
+    final customerProvider = Provider.of<CustomerProvider>(context, listen: true);
+    final historyProvider = Provider.of<HistoryProvider>(context, listen: false);
     final String routeId = ModalRoute.of(context).settings.arguments as String;
 
+    routeProvider.init();
+    customerProvider.init();
+    historyProvider.init();
+
     Future.delayed(Duration(milliseconds: 1), () {
-      customerProvider.init();
       if (customerProvider.customerList(routeId).length == 0) {
-        customerProvider.getCustomers(routeId,context);
+        customerProvider.getCustomers(routeId, context);
       }
     });
+
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
@@ -37,28 +44,13 @@ class CustomersScreen extends StatelessWidget {
           style: getAppBarTextStyle(context),
         ),
         actions: [
-          ActionChip(
-            onPressed: () {
-              Navigator.of(context).pushNamed(HistoryScreen().routeName);
-            },
-            label: Text(
-              "History",
-              style: getDefaultTextStyle(context),
-            ),
-            labelPadding: const EdgeInsets.only(right: 4),
-            avatar: Icon(
-              FontAwesomeIcons.history,
-              size: 14,
-              color: Colors.grey.shade700,
-            ),
-            backgroundColor: Colors.grey.shade200,
-            elevation: 0,
-          ),
           IconButton(
             onPressed: () {
+              routeProvider.logout();
               customerProvider.logout();
-              Navigator.of(context)
-                  .pushReplacementNamed(LoginScreen().routeName);
+              historyProvider.logout();
+              Navigator.of(context).pop();
+              Navigator.of(context).popAndPushNamed(LoginScreen().routeName);
             },
             icon: Icon(
               FontAwesomeIcons.signOutAlt,
@@ -71,11 +63,10 @@ class CustomersScreen extends StatelessWidget {
           ? ShimmerCustomer()
           : customerProvider.customerList(routeId).length == 0
               ? RefreshIndicator(
-                  onRefresh: () => customerProvider.refreshCustomers(routeId,context),
+                  onRefresh: () => customerProvider.refreshCustomers(routeId, context),
                   child: Container(
                     width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height -
-                        (MediaQuery.of(context).padding.top + kToolbarHeight),
+                    height: MediaQuery.of(context).size.height - (MediaQuery.of(context).padding.top + kToolbarHeight),
                     alignment: Alignment.center,
                     child: ListView(
                       shrinkWrap: false,
@@ -84,9 +75,7 @@ class CustomersScreen extends StatelessWidget {
                       children: [
                         Container(
                           width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.height -
-                              (MediaQuery.of(context).padding.top +
-                                  kToolbarHeight),
+                          height: MediaQuery.of(context).size.height - (MediaQuery.of(context).padding.top + kToolbarHeight),
                           alignment: Alignment.center,
                           child: Text(
                             "No customer available",
@@ -98,7 +87,7 @@ class CustomersScreen extends StatelessWidget {
                   ),
                 )
               : RefreshIndicator(
-                  onRefresh: () => customerProvider.refreshCustomers(routeId,context),
+                  onRefresh: () => customerProvider.refreshCustomers(routeId, context),
                   child: ListView.separated(
                     shrinkWrap: false,
                     scrollDirection: Axis.vertical,
@@ -108,8 +97,7 @@ class CustomersScreen extends StatelessWidget {
                       thickness: .25,
                     ),
                     itemBuilder: (context, index) {
-                      final Customer customer =
-                          customerProvider.customerList(routeId)[index];
+                      final Customer customer = customerProvider.customerList(routeId)[index];
                       return CustomerItem(customer);
                     },
                     itemCount: customerProvider.customerList(routeId).length,

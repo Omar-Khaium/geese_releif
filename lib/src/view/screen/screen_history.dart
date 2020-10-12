@@ -2,28 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geesereleif/src/provider/provider_customer.dart';
 import 'package:geesereleif/src/provider/provider_history.dart';
-import 'package:geesereleif/src/view/screen/screen_login.dart';
+import 'package:geesereleif/src/provider/provider_route.dart';
 import 'package:geesereleif/src/util/constraints.dart';
+import 'package:geesereleif/src/view/screen/screen_login.dart';
 import 'package:geesereleif/src/view/widget/list_item/item_history.dart';
 import 'package:geesereleif/src/view/widget/shimmer/shimmer_history.dart';
 import 'package:provider/provider.dart';
 
-// ignore: must_be_immutable
 class HistoryScreen extends StatelessWidget {
   final String routeName = "/history";
 
   @override
   Widget build(BuildContext context) {
+    String customerID = ModalRoute.of(context).settings.arguments as String;
+    final routeProvider = Provider.of<RouteProvider>(context, listen: false);
     final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
     final historyProvider = Provider.of<HistoryProvider>(context, listen: true);
 
+    routeProvider.init();
+    customerProvider.init();
+    historyProvider.init();
 
-    Future.delayed(Duration(milliseconds: 1), (){
-      historyProvider.init();
-      if (historyProvider.getAllHistories.length == 0) {
-        historyProvider.getHistory(customerProvider);
-      }
+    Future.delayed(Duration(milliseconds: 1), () {
+      if (historyProvider.getAllHistories(customerID).length == 0 &&
+          (!historyProvider.hasData.containsKey(customerID) || historyProvider.hasData[customerID]))
+        historyProvider.getHistory(customerID);
     });
+
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
@@ -33,24 +38,32 @@ class HistoryScreen extends StatelessWidget {
         centerTitle: false,
         titleSpacing: 0,
         title: Text(
-          "History",
+          "Log History",
           style: getAppBarTextStyle(context),
         ),
         actions: [
           IconButton(
             onPressed: () {
+              routeProvider.logout();
+              customerProvider.logout();
               historyProvider.logout();
-              Navigator.of(context).pushReplacementNamed(LoginScreen().routeName);
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
+              Navigator.of(context).popAndPushNamed(LoginScreen().routeName);
             },
-            icon: Icon(FontAwesomeIcons.signOutAlt, color: Colors.black),
+            icon: Icon(
+              FontAwesomeIcons.signOutAlt,
+              color: Colors.black,
+            ),
           ),
         ],
       ),
       body: historyProvider.isLoading
           ? ShimmerHistory()
-          : historyProvider.getAllHistories.length == 0
+          : historyProvider.getAllHistories(customerID).length == 0
               ? RefreshIndicator(
-                  onRefresh: () => historyProvider.refreshHistory(customerProvider),
+                  onRefresh: () => historyProvider.refreshHistory(customerID),
                   child: Container(
                     width: MediaQuery.of(context).size.width,
                     height: MediaQuery.of(context).size.height - (MediaQuery.of(context).padding.top + kToolbarHeight),
@@ -65,7 +78,7 @@ class HistoryScreen extends StatelessWidget {
                           height: MediaQuery.of(context).size.height - (MediaQuery.of(context).padding.top + kToolbarHeight),
                           alignment: Alignment.center,
                           child: Text(
-                            "No route available",
+                            "No history available",
                             style: getHintTextStyle(context),
                           ),
                         ),
@@ -74,14 +87,14 @@ class HistoryScreen extends StatelessWidget {
                   ),
                 )
               : RefreshIndicator(
-                  onRefresh: () => historyProvider.refreshHistory(customerProvider),
+                  onRefresh: () => historyProvider.refreshHistory(customerID),
                   child: ListView.builder(
                     shrinkWrap: false,
                     scrollDirection: Axis.vertical,
                     physics: AlwaysScrollableScrollPhysics(),
                     padding: EdgeInsets.symmetric(horizontal: 16),
-                    itemBuilder: (context, index) => HistoryItem(historyProvider.getAllHistories[index]),
-                    itemCount: historyProvider.getAllHistories.length,
+                    itemBuilder: (context, index) => HistoryItem(historyProvider.getAllHistories(customerID)[index]),
+                    itemCount: historyProvider.getAllHistories(customerID).length,
                   ),
                 ),
     );

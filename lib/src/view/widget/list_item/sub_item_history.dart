@@ -16,7 +16,7 @@ class HistorySubItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
-      height: constructAddress(historyItem.customer.street, historyItem.customer.city, historyItem.customer.state, historyItem.customer.zip).isNotEmpty ? 84 : 64,
+      height: 84,
       child: Row(
         mainAxisSize: MainAxisSize.max,
         children: [
@@ -65,7 +65,7 @@ class HistorySubItem extends StatelessWidget {
             child: Container(
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(12)),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               margin: const EdgeInsets.only(bottom: 6),
               child: Column(
@@ -86,7 +86,7 @@ class HistorySubItem extends StatelessWidget {
                       ),
                       SizedBox(
                         child: Text(
-                          historyItem.customer.name ?? "-",
+                          historyItem.checkedBy ?? "-",
                           style: getDefaultTextStyle(context, isFocused: false),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -94,41 +94,31 @@ class HistorySubItem extends StatelessWidget {
                       ),
                     ],
                   ),
-                  Visibility(
-                    visible: constructAddress(historyItem.customer.street, historyItem.customer.city, historyItem.customer.state,
-                            historyItem.customer.zip)
-                        .isNotEmpty,
-                    child: SizedBox(
-                      height: 8,
-                    ),
+                  SizedBox(
+                    height: 8,
                   ),
-                  Visibility(
-                    visible: constructAddress(historyItem.customer.street, historyItem.customer.city, historyItem.customer.state,
-                            historyItem.customer.zip)
-                        .isNotEmpty,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          FontAwesomeIcons.mapMarkerAlt,
-                          size: 12,
-                          color: hintColor,
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        FontAwesomeIcons.crow,
+                        size: 12,
+                        color: textColor,
+                      ),
+                      SizedBox(
+                        width: 12,
+                      ),
+                      SizedBox(
+                        child: Text(
+                          historyItem.geeseCount.toString() ?? "-",
+                          style: getDefaultTextStyle(context, isFocused: false),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        SizedBox(
-                          width: 12,
-                        ),
-                        SizedBox(
-                          child: Text(
-                            constructAddress(historyItem.customer.street, historyItem.customer.city, historyItem.customer.state,
-                                historyItem.customer.zip),
-                            style: getCaptionTextStyle(context),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          width: MediaQuery.of(context).size.width * .7 - 72,
-                        ),
-                      ],
-                    ),
+                        width: MediaQuery.of(context).size.width * .7 - 72,
+                      ),
+                    ],
                   ),
+
                 ],
               ),
             ),

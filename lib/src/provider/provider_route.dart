@@ -110,5 +110,6 @@ class RouteProvider extends ChangeNotifier {
   logout() {
     user.isAuthenticated = false;
     userBox.putAt(0, user);
+    clear();
   }
 }

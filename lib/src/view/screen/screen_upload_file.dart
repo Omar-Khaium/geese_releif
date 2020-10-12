@@ -6,12 +6,14 @@ import 'package:geesereleif/src/provider/provider_customer.dart';
 import 'package:geesereleif/src/provider/provider_keyboard.dart';
 import 'package:geesereleif/src/util/constraints.dart';
 import 'package:geesereleif/src/view/widget/widget_loading.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 
+// ignore: must_be_immutable
 class UploadFileScreen extends StatelessWidget {
   final String routeName = "/upload_file";
 
-  TextEditingController noteController = TextEditingController();
+  final TextEditingController noteController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -33,11 +35,16 @@ class UploadFileScreen extends StatelessWidget {
             left: 0,
             bottom: 64,
             child: image != null
-                ? Image.memory(
-                    image.readAsBytesSync(),
-                    fit: BoxFit.cover,
-                    filterQuality: FilterQuality.high,
-                  )
+                ? PhotoView.customChild(
+              minScale: 1.0,
+              tightMode: true,
+              child: Image.memory(
+                image.readAsBytesSync(),
+                fit: BoxFit.contain,
+                scale: 1,
+                filterQuality: FilterQuality.high,
+              ),
+            )
                 : Container(),
           ),
           Positioned(

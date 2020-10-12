@@ -309,7 +309,7 @@ class CustomerProvider extends ChangeNotifier {
   void newMedia(String customerId, String path, String note) {
     Customer customer = findCustomerByID(customerId);
     customer.mediaList.add(
-      MediaFile(path, DateTime.now().toIso8601String(), "me", note),
+      MediaFile(path, refineLocal(DateTime.now().toIso8601String()), user.name, note),
     );
     notifyListeners();
   }
@@ -336,6 +336,7 @@ class CustomerProvider extends ChangeNotifier {
   logout() {
     user.isAuthenticated = false;
     userBox.putAt(0, user);
+    clear();
   }
 
   changeLastCheckInOutTime(String date, String guid) {

@@ -48,7 +48,7 @@ class Customer {
       city = customer["City"];
       state = customer["State"];
       zip = customer["Zip"];
-      lastCheckIn = refineUTC(customer["LastCheckedInTime"].toString().contains(".") ? customer["LastCheckedInTime"] : "${customer["LastCheckedInTime"]}.000", "yyyy-MM-dd'T'HH:mm:ss.SSS");
+      lastCheckIn = refineUTC(customer["LastCheckedInTime"].toString().contains(".") ? customer["LastCheckedInTime"] : "${customer["LastCheckedInTime"]}.000", "yyyy-MM-dd'T'HH:mm:ss.SSS") ?? "";
       geeseCount = customer["GeeseCount"];
       isCheckedIn = customer["IsCheckedIn"];
 

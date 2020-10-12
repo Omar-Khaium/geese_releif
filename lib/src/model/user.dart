@@ -78,7 +78,7 @@ class User {
     id = json["emp"]["Id"];
     guid = json["emp"]["UserId"];
     profilePicture = "http://app.rmrcloud.com${json["emp"]["ProfilePicture"]}";
-    name = "${json["emp"]["FirstName"]} ${json["emp"]["LastName"]}";
+    name = "${json["emp"]["FirstName"]} ${json["emp"]["LastName"]}".trim();
     phone = json["emp"]["Phone"];
     street = json["emp"]["Street"];
     city = json["emp"]["City"];

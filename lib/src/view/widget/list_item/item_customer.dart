@@ -15,66 +15,42 @@ class CustomerItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       dense: true,
+      contentPadding: EdgeInsets.symmetric(horizontal: 12,vertical: 0),
+      visualDensity: VisualDensity.compact,
       onTap: () {
         Navigator.of(context).pushNamed(CustomerDetailsScreen().routeName, arguments: customer.guid);
       },
-      trailing: Icon(
-        Icons.keyboard_arrow_right,
-        size: 18,
-        color: hintColor,
+      title: Text(
+        customer.name,
+        style: getDefaultTextStyle(context, isFocused: true),
+        overflow: TextOverflow.ellipsis,
       ),
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: MediaQuery.of(context).size.width * .4,
+      subtitle: Visibility(
+        visible: (customer.phone ?? "").isNotEmpty,
+        child: Text(
+          customer.phone ?? "",
+          style: getCaptionTextStyle(context),
+        ),
+      ),
+      trailing: Visibility(
+        visible: constructAddress(customer.street, customer.city, customer.state, customer.zip).isNotEmpty,
+        child: InkWell(
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          onTap: () {
+            MapsLauncher.launchQuery(
+              constructAddress(customer.street, customer.city, customer.state, customer.zip),
+            );
+          },
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width * .35,
             child: Text(
-              customer.name,
-              style: getDefaultTextStyle(context, isFocused: true),
+              constructAddress(customer.street, customer.city, customer.state, customer.zip),
+              style: getClickableTextStyle(context),
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          Visibility(
-            visible: constructAddress(customer.street, customer.city, customer.state, customer.zip).isNotEmpty,
-            child: InkWell(
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-              onTap: () {
-                MapsLauncher.launchQuery(
-                  constructAddress(customer.street, customer.city, customer.state, customer.zip),
-                );
-              },
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * .35,
-                child: Text(
-                  constructAddress(customer.street, customer.city, customer.state, customer.zip),
-                  style: getClickableTextStyle(context),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-      subtitle: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Visibility(
-            visible: customer.lastCheckIn.startsWith("20"),
-            child: Text(
-              customer.lastCheckIn.startsWith("20")
-                  ? "${dateTimeToStringDate(stringToDateTime(customer.lastCheckIn), "dd MMM, yyyy")} ${dateTimeToStringTime(stringToDateTime(customer.lastCheckIn), "hh:mm a")}"
-                  : "no check-in record found",
-              style: getCaptionTextStyle(context),
-            ),
-          ),
-          Text(
-            customer.phone,
-            style: getCaptionTextStyle(context),
-          ),
-        ],
+        ),
       ),
     );
   }

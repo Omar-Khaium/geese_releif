@@ -11,6 +11,7 @@ import 'package:geesereleif/src/provider/provider_history.dart';
 import 'package:geesereleif/src/provider/provider_keyboard.dart';
 import 'package:geesereleif/src/util/constraints.dart';
 import 'package:geesereleif/src/util/helper.dart';
+import 'package:geesereleif/src/view/screen/screen_history.dart';
 import 'package:geesereleif/src/view/screen/screen_upload_file.dart';
 import 'package:geesereleif/src/view/widget/bottom_sheet_check_in.dart';
 import 'package:geesereleif/src/view/widget/bottom_sheet_media.dart';
@@ -193,7 +194,27 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                 color: accentColor,
               ),
             ),
-          )
+          ),
+          ActionChip(
+            onPressed: () {
+              Navigator.of(context).pushNamed(HistoryScreen().routeName, arguments: customer.guid);
+            },
+            label: Visibility(
+              child: Text(
+                "History",
+                style: getDefaultTextStyle(context),
+              ),
+            ),
+            labelPadding: const EdgeInsets.only(right: 4),
+            avatar: Icon(
+              FontAwesomeIcons.history,
+              size: 14,
+              color: Colors.grey.shade700,
+            ),
+            backgroundColor: Colors.grey.shade200,
+            elevation: 0,
+          ),
+          SizedBox(width: 12,),
         ],
       ),
       body: Stack(
@@ -341,8 +362,8 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                               customer.guid,
                               Note(
                                 _noteController.text,
-                                DateTime.now().toIso8601String(),
-                                "me",
+                                refineLocal(DateTime.now().toIso8601String()),
+                                customerProvider.user.name,
                               ),
                             );
                             setState(() {
@@ -496,8 +517,8 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                                   customerProvider,
                                   onSave: (count) {
                                     customerProvider.newCheckIn(customer.guid, count);
-                                    customerProvider.changeLastCheckInOutTime(DateTime.now().toIso8601String(), customer.guid);
-                                    historyProvider.newCheckIn(customer);
+                                    customerProvider.changeLastCheckInOutTime(refineLocal(DateTime.now().toIso8601String()), customer.guid);
+                                    historyProvider.newCheckIn(customer, count);
                                   },
                                 ),
                               ),
@@ -544,7 +565,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
   }
 
   Future getImage(source, customerId) async {
-    final pickedFile = await picker.getImage(source: source);
+    final pickedFile = await picker.getImage(source: source,imageQuality: source== ImageSource.camera ? 50 : 60);
 
     setState(() {
       _image = File(pickedFile.path);

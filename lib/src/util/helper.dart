@@ -13,19 +13,26 @@ List<History> parseHistory(List<History> histories) {
     if (position != -1) {
       list[position].items.add(HistoryItem(
           time: history.dateTime,
-          customer: history.customer,
+          customerGuid: history.customerGUID,
+          checkedBy: history.checkedBy,
+          geeseCount: history.geeseCount,
           logType: history.logType));
     } else {
       list.add(History(
-          dateTime: history.dateTime,
-          customer: history.customer,
-          logType: history.logType,
-          items: [
-            HistoryItem(
-                time: history.dateTime,
-                customer: history.customer,
-                logType: history.logType)
-          ]));
+        dateTime: history.dateTime,
+        customerGUID: history.customerGUID,
+        logType: history.logType,
+        checkedBy: history.checkedBy,
+        geeseCount: history.geeseCount,
+        items: [
+          HistoryItem(
+              time: history.dateTime,
+              customerGuid: history.customerGUID,
+              checkedBy: history.checkedBy,
+              geeseCount: history.geeseCount,
+              logType: history.logType)
+        ],
+      ));
     }
   }
   return list;
@@ -33,10 +40,7 @@ List<History> parseHistory(List<History> histories) {
 
 int doesHistoryExists(List<History> histories, History history) {
   for (int i = 0; i < histories.length; i++) {
-    if (stringToDateTime(histories[i].dateTime)
-            .difference(stringToDateTime(history.dateTime))
-            .inDays ==
-        0) {
+    if (stringToDateTime(histories[i].dateTime).difference(stringToDateTime(history.dateTime)).inDays == 0) {
       return i;
     }
   }
@@ -48,11 +52,9 @@ DateTime stringToDateTime(String date) {
   return dateTime;
 }
 
-String dateTimeToStringDate(DateTime date, String pattern) =>
-    DateFormat(pattern).format(date);
+String dateTimeToStringDate(DateTime date, String pattern) => DateFormat(pattern).format(date);
 
-String dateTimeToStringTime(DateTime date, String pattern) =>
-    DateFormat(pattern).format(date);
+String dateTimeToStringTime(DateTime date, String pattern) => DateFormat(pattern).format(date);
 
 String dateTimeToFriendlyDate(DateTime date, String pattern) {
   try {
@@ -74,8 +76,7 @@ String dateTimeToFriendlyTime(DateTime date, String pattern) {
     int diff = DateTime.now().difference(date).inMinutes;
     if (diff < 0) {
       return "0m ago";
-    }
-    else if (diff >=0 && diff <= 60) {
+    } else if (diff >= 0 && diff <= 60) {
       return "${diff}m ago";
     } else if (diff <= 24 * 60) {
       return "${diff ~/ 60}h ago";
@@ -91,6 +92,13 @@ String refineUTC(String date, String pattern) {
   DateTime dateTime = DateFormat(pattern).parse(date);
   dateTime = dateTime.add(DateTime.now().timeZoneOffset);
   return dateTime.toIso8601String();
+}
+
+String refineLocal(String date) {
+  if (date.split(".")[1].length > 3) {
+    return "${date.split(".")[0]}.${date.split(".")[1].substring(0, 3)}";
+  } else
+    return date;
 }
 
 LogType parseLogType(String log) {

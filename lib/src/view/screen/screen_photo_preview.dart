@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geesereleif/src/model/media_file.dart';
 import 'package:geesereleif/src/util/constraints.dart';
 import 'package:geesereleif/src/util/helper.dart';
+import 'package:photo_view/photo_view.dart';
 
 class ViewPhotoScreen extends StatelessWidget {
   final String routeName = "/photo_preview";
@@ -20,18 +21,22 @@ class ViewPhotoScreen extends StatelessWidget {
           height: MediaQuery.of(context).size.height,
           child: Stack(
             children: [
-              CachedNetworkImage(
-                imageUrl: file.url,
-                imageBuilder: (context, imageProvider) => Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: imageProvider,
-                      fit: BoxFit.cover,
+              PhotoView.customChild(
+                minScale: 1.0,
+                tightMode: true,
+                child: CachedNetworkImage(
+                  imageUrl: file.url,
+                  imageBuilder: (context, imageProvider) => Container(
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: imageProvider,
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
+                  placeholder: (context, url) => CircularProgressIndicator(),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
                 ),
-                placeholder: (context, url) => CircularProgressIndicator(),
-                errorWidget: (context, url, error) => Icon(Icons.error),
               ),
               Positioned(
                 left: 16,

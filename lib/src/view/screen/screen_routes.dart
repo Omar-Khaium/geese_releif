@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:geesereleif/src/provider/provider_customer.dart';
+import 'package:geesereleif/src/provider/provider_history.dart';
 import 'package:geesereleif/src/provider/provider_route.dart';
 import 'package:geesereleif/src/util/constraints.dart';
 import 'package:geesereleif/src/view/screen/screen_customers.dart';
-import 'package:geesereleif/src/view/screen/screen_history.dart';
 import 'package:geesereleif/src/view/screen/screen_login.dart';
 import 'package:geesereleif/src/view/widget/shimmer/shimmer_route.dart';
 import 'package:provider/provider.dart';
@@ -14,11 +15,16 @@ class RoutesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final routeProvider = Provider.of<RouteProvider>(context);
+    final routeProvider = Provider.of<RouteProvider>(context, listen: true);
+    final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
+    final historyProvider = Provider.of<HistoryProvider>(context, listen: false);
+
+    routeProvider.init();
+    customerProvider.init();
+    historyProvider.init();
 
     Future.delayed(Duration(milliseconds: 1), () {
       if (routeProvider.routeList.length == 0) {
-        routeProvider.init();
         routeProvider.getRoutes(context);
       }
     });
@@ -36,30 +42,12 @@ class RoutesScreen extends StatelessWidget {
           style: getAppBarTextStyle(context),
         ),
         actions: [
-          ActionChip(
-            onPressed: () {
-              Navigator.of(context).pushNamed(HistoryScreen().routeName);
-            },
-            label: Visibility(
-              child: Text(
-                "History",
-                style: getDefaultTextStyle(context),
-              ),
-            ),
-            labelPadding: const EdgeInsets.only(right: 4),
-            avatar: Icon(
-              FontAwesomeIcons.history,
-              size: 14,
-              color: Colors.grey.shade700,
-            ),
-            backgroundColor: Colors.grey.shade200,
-            elevation: 0,
-          ),
           IconButton(
             onPressed: () {
               routeProvider.logout();
-              Navigator.of(context)
-                  .pushReplacementNamed(LoginScreen().routeName);
+              customerProvider.logout();
+              historyProvider.logout();
+              Navigator.of(context).pushReplacementNamed(LoginScreen().routeName);
             },
             icon: Icon(
               FontAwesomeIcons.signOutAlt,
@@ -75,8 +63,7 @@ class RoutesScreen extends StatelessWidget {
                   onRefresh: () => routeProvider.refreshRoutes(context),
                   child: Container(
                     width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height -
-                        (MediaQuery.of(context).padding.top + kToolbarHeight),
+                    height: MediaQuery.of(context).size.height - (MediaQuery.of(context).padding.top + kToolbarHeight),
                     alignment: Alignment.center,
                     child: ListView(
                       shrinkWrap: false,
@@ -85,9 +72,7 @@ class RoutesScreen extends StatelessWidget {
                       children: [
                         Container(
                           width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.height -
-                              (MediaQuery.of(context).padding.top +
-                                  kToolbarHeight),
+                          height: MediaQuery.of(context).size.height - (MediaQuery.of(context).padding.top + kToolbarHeight),
                           alignment: Alignment.center,
                           child: Text(
                             "No route available",
@@ -111,9 +96,7 @@ class RoutesScreen extends StatelessWidget {
                     itemBuilder: (context, index) => ListTile(
                       dense: true,
                       onTap: () {
-                        Navigator.of(context).pushNamed(
-                            CustomersScreen().routeName,
-                            arguments: routeProvider.routeList[index].guid);
+                        Navigator.of(context).pushNamed(CustomersScreen().routeName, arguments: routeProvider.routeList[index].guid);
                       },
                       trailing: Icon(
                         Icons.keyboard_arrow_right,

@@ -16,25 +16,27 @@ dependencies:
   font_awesome_flutter:
   hive:
   hive_flutter:
-  shimmer:
   flushbar: 1.10.0
   intl:
   url_launcher:
   keyboard_visibility:
   maps_launcher:
   bubble:
-  flutter_staggered_grid_view:
   photo_view:
   image_picker:
   image_cropper:
   cached_network_image:
-
+  flutter_image_compress:
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   hive_generator:
   build_runner:
+  analyzer:
+
+dependency_overrides:
+  analyzer: 0.39.16
 
 flutter:
   uses-material-design: true
