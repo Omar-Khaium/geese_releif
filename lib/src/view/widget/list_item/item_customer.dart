@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geesereleif/src/model/customer.dart';
+import 'package:geesereleif/src/provider/provider_customer.dart';
 import 'package:geesereleif/src/view/screen/screen_customer_details.dart';
 import 'package:geesereleif/src/util/constraints.dart';
 import 'package:geesereleif/src/util/helper.dart';
 import 'package:maps_launcher/maps_launcher.dart';
+import 'package:provider/provider.dart';
 
 class CustomerItem extends StatelessWidget {
   final Customer customer;
@@ -13,6 +15,9 @@ class CustomerItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final customerProvider = Provider.of<CustomerProvider>(context,listen: false);
+    customerProvider.init();
+
     return ListTile(
       dense: true,
       contentPadding: EdgeInsets.symmetric(horizontal: 12,vertical: 0),
@@ -26,7 +31,7 @@ class CustomerItem extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
       ),
       subtitle: Visibility(
-        visible: (customer.phone ?? "").isNotEmpty,
+        visible: customerProvider.user.role=="Admin" && (customer.phone ?? "").isNotEmpty,
         child: Text(
           customer.phone ?? "",
           style: getCaptionTextStyle(context),

@@ -27,6 +27,7 @@ dependencies:
   image_cropper:
   cached_network_image:
   flutter_image_compress:
+  app_settings:
 
 dev_dependencies:
   flutter_test:
@@ -34,9 +35,6 @@ dev_dependencies:
   hive_generator:
   build_runner:
   analyzer:
-
-dependency_overrides:
-  analyzer: 0.39.16
 
 flutter:
   uses-material-design: true

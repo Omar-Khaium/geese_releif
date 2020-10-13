@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:geesereleif/src/model/user.dart';
 import 'package:geesereleif/src/provider/provider_customer.dart';
@@ -61,8 +64,7 @@ class MyApp extends StatelessWidget {
           OnBoardingScreen().routeName: (context) => OnBoardingScreen(),
           RoutesScreen().routeName: (context) => RoutesScreen(),
           CustomersScreen().routeName: (context) => CustomersScreen(),
-          CustomerDetailsScreen().routeName: (context) =>
-              CustomerDetailsScreen(),
+          CustomerDetailsScreen().routeName: (context) => CustomerDetailsScreen(),
           UploadFileScreen().routeName: (context) => UploadFileScreen(),
           ViewPhotoScreen().routeName: (context) => ViewPhotoScreen(),
           HistoryScreen().routeName: (context) => HistoryScreen(),
@@ -75,15 +77,48 @@ class MyApp extends StatelessWidget {
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final keyboardProvider =
-        Provider.of<KeyboardProvider>(context, listen: false);
+    final keyboardProvider = Provider.of<KeyboardProvider>(context, listen: false);
     keyboardProvider.init();
     keyboardProvider.hideKeyboard(context);
 
-    Future.delayed(Duration(milliseconds: 0), () {
-      redirect(context);
-    });
-
+    try {
+      Future.delayed(Duration(milliseconds: 0), () {
+        redirect(context);
+      });
+    } catch (error) {
+      showDialog(
+          context: context,
+          builder: (context) => WillPopScope(
+            onWillPop: () async => false,
+            child: AlertDialog(
+              title: Text(
+                "Notice",
+                style: getDeleteTextStyle(context),
+              ),
+              content: Text(
+                "Your app's local database's structure has changed to implementing a new feature.\nIt is mandatory to 're-install' the app by 'uninstalling' first.\nSorry for the inconvenience.${Platform.isAndroid ? "\n\nP.S. after clicking on 'UNINSTALL', follow step below as mentioned.\n1. find 'Geese Relief' under 'Apps & notifications'\n2. click on 'Storage'\n3. click on 'CLEAR DATA'\n5. uninstall and re-install 'Geese Relief'\n\n enjoy your day :D" : ""}",
+                style: getDefaultTextStyle(context, isFocused: true),
+              ),
+              actions: [
+                FlatButton(
+                  onPressed: () {
+                    if(Platform.isAndroid) {
+                      AppSettings.openAppSettings();
+                    } else {
+                      exit(0);
+                    }
+                  },
+                  child: Text(
+                    "UNINSTALL",
+                    style: getButtonTextStyle(context, isOutline: false),
+                  ),
+                  color: Colors.red,
+                )
+              ],
+            ),
+          ),
+          barrierDismissible: false);
+    }
     return Scaffold(
       backgroundColor: backgroundColor,
       body: Center(
@@ -97,13 +132,51 @@ class HomeScreen extends StatelessWidget {
   }
 
   redirect(BuildContext context) async {
-    Box<User> userBox = await Hive.openBox("users");
-    User user =
-        userBox == null ? null : userBox.length > 0 ? userBox.getAt(0) : null;
-    Navigator.of(context).pushReplacementNamed(user == null
-        ? LoginScreen().routeName
-        : user.isAuthenticated ?? false
-            ? RoutesScreen().routeName
-            : LoginScreen().routeName);
+    try {
+      Box<User> userBox = await Hive.openBox("users");
+      User user = userBox == null
+          ? null
+          : userBox.length > 0
+              ? userBox.getAt(0)
+              : null;
+      Navigator.of(context).pushReplacementNamed(user == null
+          ? LoginScreen().routeName
+          : user.isAuthenticated ?? false
+              ? RoutesScreen().routeName
+              : LoginScreen().routeName);
+    } catch (error) {
+      showDialog(
+          context: context,
+          builder: (context) => WillPopScope(
+                onWillPop: () async => false,
+                child: AlertDialog(
+                  title: Text(
+                    "Notice",
+                    style: getDeleteTextStyle(context),
+                  ),
+                  content: Text(
+                    "Your app's local database's structure has changed to implementing a new feature.\nIt is mandatory to 're-install' the app by 'uninstalling' first.\nSorry for the inconvenience.${Platform.isAndroid ? "\n\nP.S. after clicking on 'UNINSTALL', follow step below as mentioned.\n1. find 'Geese Relief' under 'Apps & notifications'\n2. click on 'Storage'\n3. click on 'CLEAR DATA'\n5. uninstall and re-install 'Geese Relief'\n\n enjoy your day :D" : ""}",
+                    style: getDefaultTextStyle(context, isFocused: true),
+                  ),
+                  actions: [
+                    FlatButton(
+                      onPressed: () {
+                        if(Platform.isAndroid) {
+                          AppSettings.openAppSettings();
+                        } else {
+                          exit(0);
+                        }
+                      },
+                      child: Text(
+                        "UNINSTALL",
+                        style: getButtonTextStyle(context, isOutline: false),
+                      ),
+                      color: Colors.red,
+                    )
+                  ],
+                ),
+              ),
+          barrierDismissible: false);
+    }
   }
 }

@@ -16,7 +16,7 @@ class HistorySubItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
-      height: 84,
+      height: historyItem.logType == LogType.CheckedOut ? 64 : 84,
       child: Row(
         mainAxisSize: MainAxisSize.max,
         children: [
@@ -94,29 +94,35 @@ class HistorySubItem extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(
-                    height: 8,
+                  Visibility(
+                    visible: historyItem.logType!=LogType.CheckedOut,
+                    child: SizedBox(
+                      height: 8,
+                    ),
                   ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        FontAwesomeIcons.crow,
-                        size: 12,
-                        color: textColor,
-                      ),
-                      SizedBox(
-                        width: 12,
-                      ),
-                      SizedBox(
-                        child: Text(
-                          historyItem.geeseCount.toString() ?? "-",
-                          style: getDefaultTextStyle(context, isFocused: false),
-                          overflow: TextOverflow.ellipsis,
+                  Visibility(
+                    visible: historyItem.logType!=LogType.CheckedOut,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          FontAwesomeIcons.crow,
+                          size: 12,
+                          color: textColor,
                         ),
-                        width: MediaQuery.of(context).size.width * .7 - 72,
-                      ),
-                    ],
+                        SizedBox(
+                          width: 12,
+                        ),
+                        SizedBox(
+                          child: Text(
+                            historyItem.geeseCount.toString() ?? "-",
+                            style: getDefaultTextStyle(context, isFocused: false),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          width: MediaQuery.of(context).size.width * .7 - 72,
+                        ),
+                      ],
+                    ),
                   ),
 
                 ],

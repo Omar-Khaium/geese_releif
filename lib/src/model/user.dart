@@ -29,26 +29,28 @@ class User {
   String zip;
   @HiveField(11)
   String password;
-  @HiveField(21)
-  bool isRemembered;
   @HiveField(12)
-  String lastUpdatedDate;
+  bool isRemembered;
   @HiveField(13)
-  bool rememberMeEnabled;
+  String lastUpdatedDate;
   @HiveField(14)
-  bool isAuthenticated = false;
+  bool rememberMeEnabled;
   @HiveField(15)
-  String companyLogo;
+  bool isAuthenticated = false;
   @HiveField(16)
-  String companyName;
+  String companyLogo;
   @HiveField(17)
-  String companyGUID;
+  String companyName;
   @HiveField(18)
-  String companyCity;
+  String companyGUID;
   @HiveField(19)
-  String companyState;
+  String companyCity;
   @HiveField(20)
+  String companyState;
+  @HiveField(21)
   String companyZip;
+  @HiveField(22)
+  String role;
 
   User(
       {this.id,
@@ -72,7 +74,8 @@ class User {
       this.companyGUID,
       this.companyCity,
       this.companyState,
-      this.companyZip});
+      this.companyZip,
+      this.role});
 
   User.fromJson(Map<String, dynamic> json, User old) {
     id = json["emp"]["Id"];
@@ -96,5 +99,6 @@ class User {
     companyCity = json["company"]["City"];
     companyState = json["company"]["State"];
     companyZip = json["company"]["ZipCode"];
+    role = json["emp"]["Role"];
   }
 }

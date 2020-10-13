@@ -28,24 +28,25 @@ class UserAdapter extends TypeAdapter<User> {
       city: fields[8] as String,
       state: fields[9] as String,
       zip: fields[10] as String,
-      lastUpdatedDate: fields[12] as String,
+      lastUpdatedDate: fields[13] as String,
       password: fields[11] as String,
-      isRemembered: fields[21] as bool,
-      rememberMeEnabled: fields[13] as bool,
-      isAuthenticated: fields[14] as bool,
-      companyLogo: fields[15] as String,
-      companyName: fields[16] as String,
-      companyGUID: fields[17] as String,
-      companyCity: fields[18] as String,
-      companyState: fields[19] as String,
-      companyZip: fields[20] as String,
+      isRemembered: fields[12] as bool,
+      rememberMeEnabled: fields[14] as bool,
+      isAuthenticated: fields[15] as bool,
+      companyLogo: fields[16] as String,
+      companyName: fields[17] as String,
+      companyGUID: fields[18] as String,
+      companyCity: fields[19] as String,
+      companyState: fields[20] as String,
+      companyZip: fields[21] as String,
+      role: fields[22] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, User obj) {
     writer
-      ..writeByte(22)
+      ..writeByte(23)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -70,26 +71,28 @@ class UserAdapter extends TypeAdapter<User> {
       ..write(obj.zip)
       ..writeByte(11)
       ..write(obj.password)
-      ..writeByte(21)
-      ..write(obj.isRemembered)
       ..writeByte(12)
-      ..write(obj.lastUpdatedDate)
+      ..write(obj.isRemembered)
       ..writeByte(13)
-      ..write(obj.rememberMeEnabled)
+      ..write(obj.lastUpdatedDate)
       ..writeByte(14)
-      ..write(obj.isAuthenticated)
+      ..write(obj.rememberMeEnabled)
       ..writeByte(15)
-      ..write(obj.companyLogo)
+      ..write(obj.isAuthenticated)
       ..writeByte(16)
-      ..write(obj.companyName)
+      ..write(obj.companyLogo)
       ..writeByte(17)
-      ..write(obj.companyGUID)
+      ..write(obj.companyName)
       ..writeByte(18)
-      ..write(obj.companyCity)
+      ..write(obj.companyGUID)
       ..writeByte(19)
-      ..write(obj.companyState)
+      ..write(obj.companyCity)
       ..writeByte(20)
-      ..write(obj.companyZip);
+      ..write(obj.companyState)
+      ..writeByte(21)
+      ..write(obj.companyZip)
+      ..writeByte(22)
+      ..write(obj.role);
   }
 
   @override

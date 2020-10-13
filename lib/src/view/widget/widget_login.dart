@@ -224,6 +224,7 @@ class _LoginFormState extends State<LoginForm> {
         alertERROR(context: context, message: "Can't fetch user's information.");
       }
     } catch (error) {
+      print(error);
       Navigator.of(context).pop();
       if (error.toString().contains("SocketException")) {
         networkERROR(context: context);

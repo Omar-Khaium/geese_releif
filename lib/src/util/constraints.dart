@@ -38,6 +38,13 @@ enum LogType {
   CheckedOut,
 }
 
+enum Role {
+  Admin,
+  Employee,
+  Customer,
+  None,
+}
+
 TextStyle getAppBarTextStyle(BuildContext context) {
   return GoogleFonts.montserrat(
     textStyle: Theme.of(context)

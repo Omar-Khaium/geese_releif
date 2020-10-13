@@ -232,7 +232,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
                 physics: ScrollPhysics(),
                 children: [
                   Visibility(
-                    visible: customer.phone.isNotEmpty,
+                    visible: customerProvider.user.role=="Admin" && customer.phone.isNotEmpty,
                     child: ListTile(
                       onTap: () {
                         if (customer.phone.isNotEmpty) launch("tel:${customer.phone}");

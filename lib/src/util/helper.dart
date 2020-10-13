@@ -181,3 +181,16 @@ void alertSuccess({@required BuildContext context, @required String message}) {
     message: message,
   )..show(context);
 }
+
+Role parseRole(String value) {
+  switch(value) {
+    case "Admin":
+      return Role.Admin;
+    case "Employee":
+      return Role.Employee;
+    case "Customer":
+      return Role.Customer;
+    default:
+      return Role.None;
+  }
+}
