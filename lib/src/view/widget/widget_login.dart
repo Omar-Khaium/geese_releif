@@ -44,11 +44,7 @@ class _LoginFormState extends State<LoginForm> {
     final routeProvider = Provider.of<RouteProvider>(context, listen: false);
     final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
     final historyProvider = Provider.of<HistoryProvider>(context, listen: false);
-    Future.delayed(Duration(milliseconds: 0), () {
-      routeProvider.clear();
-      customerProvider.clear();
-      historyProvider.clear();
-    });
+
     return Form(
       key: _formKey,
       child: ListView(
@@ -149,7 +145,7 @@ class _LoginFormState extends State<LoginForm> {
                   user.password = _passwordController.text;
                   FocusScope.of(context).requestFocus(FocusNode());
                   showDialog(context: context, builder: (context) => Loading(Colors.blue));
-                  login();
+                  login(routeProvider, customerProvider, historyProvider);
                 }
               },
             ),
@@ -159,7 +155,7 @@ class _LoginFormState extends State<LoginForm> {
     );
   }
 
-  login() async {
+  login(RouteProvider routeProvider, CustomerProvider customerProvider, HistoryProvider historyProvider) async {
     try {
       Map<String, String> headers = {};
       Map<String, String> body = {
@@ -176,7 +172,7 @@ class _LoginFormState extends State<LoginForm> {
         user.token = "${result["token_type"]} ${result["access_token"]} ";
         Navigator.of(context).pop();
         showDialog(context: context, builder: (context) => Loading(Colors.green));
-        getProfileData();
+        getProfileData(routeProvider, customerProvider, historyProvider);
       } else if (response.statusCode == 500) {
         Navigator.of(context).pop();
         alertERROR(context: context, message: "Username name is incorrect.");
@@ -199,7 +195,7 @@ class _LoginFormState extends State<LoginForm> {
     }
   }
 
-  getProfileData() async {
+  getProfileData(RouteProvider routeProvider, CustomerProvider customerProvider, HistoryProvider historyProvider) async {
     try {
       Map<String, String> headers = {
         "authorization": user.token,
@@ -217,6 +213,11 @@ class _LoginFormState extends State<LoginForm> {
         } else {
           userBox.putAt(0, user);
         }
+
+        routeProvider.clear();
+        customerProvider.clear();
+        historyProvider.clear();
+
         Navigator.of(context).pop();
         Navigator.of(context).pushReplacementNamed(RoutesScreen().routeName);
       } else {

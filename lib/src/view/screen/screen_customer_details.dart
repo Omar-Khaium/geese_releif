@@ -37,7 +37,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final String id = ModalRoute.of(context).settings.arguments as String;
+    final String id = ModalRoute.of(context).settings.arguments as String ?? "";
     final customerProvider = Provider.of<CustomerProvider>(context, listen: true);
     final historyProvider = Provider.of<HistoryProvider>(context, listen: false);
     final keyboardProvider = Provider.of<KeyboardProvider>(context, listen: true);
@@ -197,6 +197,7 @@ class _CustomerDetailsScreenState extends State<CustomerDetailsScreen> {
           ),
           ActionChip(
             onPressed: () {
+              historyProvider.reset();
               Navigator.of(context).pushNamed(HistoryScreen().routeName, arguments: customer.guid);
             },
             label: Visibility(

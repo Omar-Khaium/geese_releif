@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:geesereleif/src/model/route.dart';
 import 'package:geesereleif/src/model/user.dart';
 import 'package:geesereleif/src/util/constraints.dart';
@@ -11,23 +11,32 @@ import 'package:http/http.dart';
 
 class RouteProvider extends ChangeNotifier {
   Map<String, Routes> routes = {};
-  bool isLoading = true;
+  bool isLoading = false;
+  bool isFirstTime = true;
   User user;
   Box<User> userBox;
 
   init() {
     userBox = Hive.box("users");
-    user = userBox.getAt(0);
+    if(userBox.length > 0) {
+      user = userBox.getAt(0);
+    }
   }
 
-  Future<void> getRoutes(BuildContext context) async {
+  Future<int> getRoutes() async {
     try {
       routes = {};
+      isFirstTime = false;
+      if(!isLoading) {
+        isLoading = true;
+      }
+      notifyListeners();
+
       Map<String, String> headers = {
         "Authorization": user.token,
         "UserId": user.guid,
         "PageNo": "1",
-        "PageSize": "10",
+        "PageSize": "100",
       };
 
       Response response =
@@ -42,25 +51,31 @@ class RouteProvider extends ChangeNotifier {
         }
         isLoading = false;
         notifyListeners();
+        return 200;
       } else {
         isLoading = false;
         notifyListeners();
-        alertERROR(context: context, message: "Something went wrong.");
+        return 400;
       }
     } catch (error) {
       isLoading = false;
       notifyListeners();
       if(error.toString().contains("SocketException")){
-        networkERROR(context: context);
+        return 503;
       } else {
-        alertERROR(context: context, message: "Something went wrong.");
+        return 500;
       }
     }
   }
 
   Future<void> refreshRoutes(BuildContext context) async {
-    isLoading = true;
+
+    routes = {};
+    if(!isLoading) {
+      isLoading = true;
+    }
     notifyListeners();
+
     try {
       Map<String, String> headers = {
         "Authorization": user.token,
@@ -103,7 +118,13 @@ class RouteProvider extends ChangeNotifier {
 
   clear() {
     routes = {};
-    isLoading = true;
+    isLoading = false;
+    isFirstTime = true;
+    notifyListeners();
+  }
+
+  reset() {
+    isFirstTime = true;
     notifyListeners();
   }
 

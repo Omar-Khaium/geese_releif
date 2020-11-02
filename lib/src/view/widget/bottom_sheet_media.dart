@@ -44,6 +44,7 @@ class PhotoPreview extends StatelessWidget {
                           tag: file.url,
                           child: CachedNetworkImage(
                             imageUrl: file.url,
+                            filterQuality: FilterQuality.low,
                             imageBuilder: (context, imageProvider) => Container(
                               decoration: BoxDecoration(
                                 image: DecorationImage(
@@ -52,9 +53,9 @@ class PhotoPreview extends StatelessWidget {
                               ),
                             ),
                             placeholder: (context, url) =>
-                                CircularProgressIndicator(),
+                                Center(child: CircularProgressIndicator()),
                             errorWidget: (context, url, error) =>
-                                Icon(Icons.error),
+                                Center(child: Icon(Icons.error)),
                           ),
                         ),
                       ),

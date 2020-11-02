@@ -78,47 +78,16 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final keyboardProvider = Provider.of<KeyboardProvider>(context, listen: false);
+    final routeProvider = Provider.of<RouteProvider>(context, listen: false);
+    final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
+    final historyProvider = Provider.of<HistoryProvider>(context, listen: false);
     keyboardProvider.init();
     keyboardProvider.hideKeyboard(context);
 
-    try {
-      Future.delayed(Duration(milliseconds: 0), () {
-        redirect(context);
-      });
-    } catch (error) {
-      showDialog(
-          context: context,
-          builder: (context) => WillPopScope(
-            onWillPop: () async => false,
-            child: AlertDialog(
-              title: Text(
-                "Notice",
-                style: getDeleteTextStyle(context),
-              ),
-              content: Text(
-                "Your app's local database's structure has changed to implementing a new feature.\nIt is mandatory to 're-install' the app by 'uninstalling' first.\nSorry for the inconvenience.${Platform.isAndroid ? "\n\nP.S. after clicking on 'UNINSTALL', follow step below as mentioned.\n1. find 'Geese Relief' under 'Apps & notifications'\n2. click on 'Storage'\n3. click on 'CLEAR DATA'\n5. uninstall and re-install 'Geese Relief'\n\n enjoy your day :D" : ""}",
-                style: getDefaultTextStyle(context, isFocused: true),
-              ),
-              actions: [
-                FlatButton(
-                  onPressed: () {
-                    if(Platform.isAndroid) {
-                      AppSettings.openAppSettings();
-                    } else {
-                      exit(0);
-                    }
-                  },
-                  child: Text(
-                    "UNINSTALL",
-                    style: getButtonTextStyle(context, isOutline: false),
-                  ),
-                  color: Colors.red,
-                )
-              ],
-            ),
-          ),
-          barrierDismissible: false);
-    }
+    Future.delayed(Duration.zero, () {
+      redirect(context, routeProvider, customerProvider, historyProvider);
+    });
+
     return Scaffold(
       backgroundColor: backgroundColor,
       body: Center(
@@ -131,14 +100,18 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  redirect(BuildContext context) async {
+  redirect(
+      BuildContext context, RouteProvider routeProvider, CustomerProvider customerProvider, HistoryProvider historyProvider) async {
     try {
       Box<User> userBox = await Hive.openBox("users");
-      User user = userBox == null
-          ? null
-          : userBox.length > 0
-              ? userBox.getAt(0)
-              : null;
+      User user;
+      if (userBox.length > 0) {
+        user = userBox.getAt(0);
+      } else {
+        routeProvider.init();
+        customerProvider.init();
+        historyProvider.init();
+      }
       Navigator.of(context).pushReplacementNamed(user == null
           ? LoginScreen().routeName
           : user.isAuthenticated ?? false
@@ -161,7 +134,7 @@ class HomeScreen extends StatelessWidget {
                   actions: [
                     FlatButton(
                       onPressed: () {
-                        if(Platform.isAndroid) {
+                        if (Platform.isAndroid) {
                           AppSettings.openAppSettings();
                         } else {
                           exit(0);

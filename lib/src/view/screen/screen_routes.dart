@@ -1,10 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geesereleif/src/provider/provider_customer.dart';
 import 'package:geesereleif/src/provider/provider_history.dart';
 import 'package:geesereleif/src/provider/provider_route.dart';
 import 'package:geesereleif/src/util/constraints.dart';
+import 'package:geesereleif/src/util/helper.dart';
 import 'package:geesereleif/src/view/screen/screen_customers.dart';
 import 'package:geesereleif/src/view/screen/screen_login.dart';
 import 'package:geesereleif/src/view/widget/shimmer/shimmer_route.dart';
@@ -19,18 +19,35 @@ class RoutesScreen extends StatelessWidget {
     final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
     final historyProvider = Provider.of<HistoryProvider>(context, listen: false);
 
-    routeProvider.init();
-    customerProvider.init();
-    historyProvider.init();
+    Future.delayed(Duration.zero, () {
+      if (routeProvider.routeList.isEmpty && (!routeProvider.isLoading) && routeProvider.isFirstTime) {
 
-    Future.delayed(Duration(milliseconds: 1), () {
-      if (routeProvider.routeList.length == 0) {
-        routeProvider.getRoutes(context);
+        routeProvider.init();
+        customerProvider.init();
+        historyProvider.init();
+
+        routeProvider.getRoutes().then((value) {
+          switch (value) {
+            case 200:
+              break;
+            case 400:
+            case 500:
+              alertERROR(context: context, message: "Something went wrong.");
+              break;
+            case 503:
+              networkERROR(context: context);
+              break;
+            default:
+              alertERROR(context: context, message: "Something went wrong.");
+              break;
+          }
+        });
       }
     });
 
     return Scaffold(
       backgroundColor: backgroundColor,
+      extendBody: true,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: backgroundColor,
@@ -58,7 +75,7 @@ class RoutesScreen extends StatelessWidget {
       ),
       body: routeProvider.isLoading
           ? ShimmerRoute()
-          : routeProvider.routeList.length == 0
+          : routeProvider.routeList.isEmpty
               ? RefreshIndicator(
                   onRefresh: () => routeProvider.refreshRoutes(context),
                   child: Container(
@@ -96,6 +113,8 @@ class RoutesScreen extends StatelessWidget {
                     itemBuilder: (context, index) => ListTile(
                       dense: true,
                       onTap: () {
+                        routeProvider.reset();
+                        customerProvider.reset();
                         Navigator.of(context).pushNamed(CustomersScreen().routeName, arguments: routeProvider.routeList[index].guid);
                       },
                       trailing: Icon(

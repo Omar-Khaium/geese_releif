@@ -4,6 +4,7 @@ import 'package:geesereleif/src/provider/provider_customer.dart';
 import 'package:geesereleif/src/provider/provider_history.dart';
 import 'package:geesereleif/src/provider/provider_route.dart';
 import 'package:geesereleif/src/util/constraints.dart';
+import 'package:geesereleif/src/util/helper.dart';
 import 'package:geesereleif/src/view/screen/screen_login.dart';
 import 'package:geesereleif/src/view/widget/list_item/item_history.dart';
 import 'package:geesereleif/src/view/widget/shimmer/shimmer_history.dart';
@@ -19,14 +20,25 @@ class HistoryScreen extends StatelessWidget {
     final customerProvider = Provider.of<CustomerProvider>(context, listen: false);
     final historyProvider = Provider.of<HistoryProvider>(context, listen: true);
 
-    routeProvider.init();
-    customerProvider.init();
-    historyProvider.init();
-
     Future.delayed(Duration(milliseconds: 1), () {
-      if (historyProvider.getAllHistories(customerID).length == 0 &&
-          (!historyProvider.hasData.containsKey(customerID) || historyProvider.hasData[customerID]))
-        historyProvider.getHistory(customerID);
+      if (historyProvider.getAllHistories(customerID).isEmpty && !historyProvider.isLoading && historyProvider.isFirstTime) {
+        historyProvider.getHistory(customerID).then((value) {
+          switch (value) {
+            case 200:
+              break;
+            case 400:
+            case 500:
+              alertERROR(context: context, message: "Something went wrong.");
+              break;
+            case 503:
+              networkERROR(context: context);
+              break;
+            default:
+              alertERROR(context: context, message: "Something went wrong.");
+              break;
+          }
+        });
+      }
     });
 
     return Scaffold(
@@ -37,6 +49,13 @@ class HistoryScreen extends StatelessWidget {
         iconTheme: IconThemeData(color: textColor),
         centerTitle: false,
         titleSpacing: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: textColor,),
+          onPressed: (){
+            historyProvider.reset();
+            Navigator.of(context).pop();
+          },
+        ),
         title: Text(
           "Log History",
           style: getAppBarTextStyle(context),

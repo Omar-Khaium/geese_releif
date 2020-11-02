@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geesereleif/src/model/customer.dart';
 import 'package:geesereleif/src/provider/provider_customer.dart';
@@ -48,7 +47,7 @@ class CustomerItem extends StatelessWidget {
             );
           },
           child: SizedBox(
-            width: MediaQuery.of(context).size.width * .35,
+            width: MediaQuery.of(context).size.width * .45,
             child: Text(
               constructAddress(customer.street, customer.city, customer.state, customer.zip),
               style: getClickableTextStyle(context),

@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geesereleif/src/model/customer.dart';
 import 'package:geesereleif/src/model/media_file.dart';
@@ -16,61 +15,65 @@ import 'package:http/http.dart';
 
 class CustomerProvider extends ChangeNotifier {
   Map<String, Customer> customers = {};
-  bool isLoading = true;
+  bool isLoading = false;
+  bool isFirstTime = true;
   User user;
   Box<User> userBox;
 
   init() {
     userBox = Hive.box("users");
-    user = userBox.getAt(0);
+    if(userBox.length > 0) {
+      user = userBox.getAt(0);
+    }
   }
 
-  Future<void> getCustomers(String routeId, BuildContext context) async {
+  Future<int> getCustomers(String routeId) async {
     try {
-      customers = {};
-      if (customers.values
-          .where((element) => element.routeId == routeId)
-          .toList()
-          .length == 0) {
+      customers.removeWhere((key, value) => value.routeId==routeId);
+      isFirstTime = false;
+      if (!isLoading) {
         isLoading = true;
-        notifyListeners();
-        Map<String, String> headers = {
-          "Authorization": user.token,
-          "PageNo": "1",
-          "PageSize": "100",
-          "RouteId": routeId,
-        };
+      }
 
-        Response response = await NetworkHelper.apiGET(api: apiCustomers, headers: headers);
+      notifyListeners();
+      Map<String, String> headers = {
+        "Authorization": user.token,
+        "PageNo": "1",
+        "PageSize": "100",
+        "RouteId": routeId,
+      };
 
-        if (response.statusCode == 200) {
-          List<Map<String, dynamic>> result = List<Map<String, dynamic>>.from(json.decode(response.body)['CustomerDetail']);
-          for (Map<String, dynamic> map in result) {
-            Customer customer = Customer.fromJson(
-                map["Customers"], List<Map<String, dynamic>>.from(map["Media"]), List<Map<String, dynamic>>.from(map["Note"]), routeId);
-            if (!customers.containsKey(customer.guid)) customers[customer.guid] = customer;
-          }
-          isLoading = false;
-          notifyListeners();
-        } else {
-          isLoading = false;
-          notifyListeners();
-          alertERROR(context: context, message: "Something went wrong.");
+      Response response = await NetworkHelper.apiGET(api: apiCustomers, headers: headers);
+
+      if (response.statusCode == 200) {
+        List<Map<String, dynamic>> result = List<Map<String, dynamic>>.from(json.decode(response.body)['CustomerDetail']);
+        for (Map<String, dynamic> map in result) {
+          Customer customer = Customer.fromJson(
+              map["Customers"], List<Map<String, dynamic>>.from(map["Media"]), List<Map<String, dynamic>>.from(map["Note"]), routeId);
+          if (!customers.containsKey(customer.guid)) customers[customer.guid] = customer;
         }
+        isLoading = false;
+        notifyListeners();
+        return 200;
+      } else {
+        isLoading = false;
+        notifyListeners();
+        return 400;
       }
     } catch (error) {
       isLoading = false;
       notifyListeners();
       if (error.toString().contains("SocketException")) {
-        networkERROR(context: context);
+        return 503;
       } else {
-        alertERROR(context: context, message: "Something went wrong.");
+        return 500;
       }
     }
   }
 
   Future<void> refreshCustomers(String routeId, BuildContext context) async {
     isLoading = true;
+    customers.removeWhere((key, value) => value.routeId==routeId);
     notifyListeners();
     try {
       Map<String, String> headers = {
@@ -214,11 +217,13 @@ class CustomerProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> saveImage(BuildContext context,
-      String path,
-      String note,
-      String customerId,
-      CustomerProvider customerProvider,) async {
+  Future<void> saveImage(
+    BuildContext context,
+    String path,
+    String note,
+    String customerId,
+    CustomerProvider customerProvider,
+  ) async {
     try {
       Map<String, String> headers = {
         "Authorization": user.token,
@@ -248,20 +253,20 @@ class CustomerProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> uploadImage(BuildContext context,
-      File image,
-      String note,
-      String customerId,
-      CustomerProvider customerProvider,) async {
+  Future<bool> uploadImage(
+    BuildContext context,
+    File image,
+    String note,
+    String customerId,
+    CustomerProvider customerProvider,
+  ) async {
     try {
       Map<String, String> headers = {
         "Authorization": user.token,
         "Content-Type": "application/x-www-form-urlencoded",
       };
       Map<String, String> body = {
-        "filename": "${DateTime
-            .now()
-            .millisecondsSinceEpoch}.png",
+        "filename": "${DateTime.now().millisecondsSinceEpoch}.png",
         "filepath": base64.encode(image.readAsBytesSync()),
       };
 
@@ -297,7 +302,8 @@ class CustomerProvider extends ChangeNotifier {
   clear() {
     if (customers.length > 0) {
       customers = {};
-      isLoading = true;
+      isLoading = false;
+      isFirstTime = true;
       notifyListeners();
     }
   }
@@ -330,6 +336,11 @@ class CustomerProvider extends ChangeNotifier {
   void newCheckOut(String customerId) {
     Customer customer = findCustomerByID(customerId);
     customer.isCheckedIn = false;
+    notifyListeners();
+  }
+
+  reset() {
+    isFirstTime = true;
     notifyListeners();
   }
 
