@@ -19,17 +19,17 @@ final Color hintColor = Colors.black26;
 //##############################################################################
 
 //####################################-API-#####################################
-final String apiBaseUrl = "http://geeserelief-api.rmrcloud.com/api";
+final String apiBaseUrl = "http://geeserelief-api.rmrcloud.com/";
 final String apiToken = "token";
-final String apiUserInfo = "GetUserByUserName";
-final String apiRoutes = "GetRoutes";
-final String apiCustomers = "GetCustomers";
-final String apiSendNote = "SendNote";
-final String apiCheckIn = "Checkin";
-final String apiCheckOut = "Checkout";
-final String apiHistory = "GetUserHistory";
-final String apiUpload = "UploadImageFile";
-final String apiSaveMedia = "SaveMedia";
+final String apiUserInfo = "api/GetUserByUserName";
+final String apiRoutes = "api/GetRoutes";
+final String apiCustomers = "api/GetCustomers";
+final String apiSendNote = "api/SendNote";
+final String apiCheckIn = "api/Checkin";
+final String apiCheckOut = "api/Checkout";
+final String apiHistory = "api/GetUserHistory";
+final String apiUpload = "api/UploadImageFile";
+final String apiSaveMedia = "api/SaveMedia";
 //##############################################################################
 
 enum LogType {
