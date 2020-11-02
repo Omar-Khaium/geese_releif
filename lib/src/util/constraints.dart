@@ -19,7 +19,7 @@ final Color hintColor = Colors.black26;
 //##############################################################################
 
 //####################################-API-#####################################
-final String apiBaseUrl = "http://geeserelief-api.rmrcloud.com/";
+final String apiBaseUrl = "http://geeserelief-api.rmrcloud.com/api";
 final String apiToken = "token";
 final String apiUserInfo = "GetUserByUserName";
 final String apiRoutes = "GetRoutes";
