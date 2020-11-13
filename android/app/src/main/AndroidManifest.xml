@@ -1,10 +1,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.centralstationmarketing.geesereleif">
 
+    <supports-screens
+        android:largeScreens="false"
+        android:normalScreens="true"
+        android:resizeable="false"
+        android:smallScreens="true"
+        android:xlargeScreens="false" />
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:icon="@mipmap/ic_launcher"
-        android:label="Geese Releif"
+        android:label="Geese Relief"
         android:requestLegacyExternalStorage="true">
         <activity
             android:name=".MainActivity"
