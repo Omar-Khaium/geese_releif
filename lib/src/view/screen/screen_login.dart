@@ -22,24 +22,25 @@ class LoginScreen extends StatelessWidget {
                 children: [
                   Visibility(
                     visible: keyboardProvider.isKeyboardHidden,
-                    child: Image.asset(
-                      "images/logo.png",
-                      width: 144,
-                      fit: BoxFit.contain,
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 24),
+                      child: Image.asset(
+                        "images/logo.png",
+                        width: 144,
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
                   Container(
-                    width: 320,
-                    height: 320,
-                    margin: const EdgeInsets.only(top: 36),
+                    margin: const EdgeInsets.only(right: 24, left: 24),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     decoration:
                         BoxDecoration(color: backgroundColor, boxShadow: [
                       BoxShadow(
                           offset: Offset(0, 0),
-                          color: Colors.black12,
-                          spreadRadius: 12,
-                          blurRadius: 12)
+                          color: Colors.grey.shade200,
+                          spreadRadius: 3,
+                          blurRadius: 3)
                     ]),
                     child: LoginForm(),
                   ),
@@ -69,7 +70,28 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
             ),
-          )
+          ),
+          Visibility(
+            visible: keyboardProvider.isKeyboardVisible,
+            child: Expanded(
+              flex: 1,
+              child: Center(
+                child: InkWell(
+                  onTap: () {
+                    keyboardProvider.hideKeyboard(context);
+                  },
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    child: Text(
+                      "Hide Keyboard",
+                      style: getClickableTextStyle(context).copyWith(color: Colors.grey),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

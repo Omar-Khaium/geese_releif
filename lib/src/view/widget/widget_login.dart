@@ -51,6 +51,7 @@ class _LoginFormState extends State<LoginForm> {
         scrollDirection: Axis.vertical,
         shrinkWrap: true,
         physics: ScrollPhysics(),
+        padding: EdgeInsets.all(0),
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
